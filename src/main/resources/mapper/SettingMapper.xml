@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.leleo.blog.mapper.SettingMapper">
+
+    <sql id="Base_Column_List">
+        id, setting_key, setting_value, description, create_time, update_time
+    </sql>
+
+    <select id="selectByKey" resultType="Setting">
+        SELECT <include refid="Base_Column_List"/>
+        FROM sys_setting
+        WHERE setting_key = #{settingKey}
+    </select>
+
+    <insert id="upsert" parameterType="Setting">
+        INSERT INTO sys_setting (setting_key, setting_value, description)
+        VALUES (#{settingKey}, #{settingValue}, #{description})
+        ON DUPLICATE KEY UPDATE setting_value = #{settingValue}, description = #{description}
+    </insert>
+
+    <select id="selectById" resultType="Setting">
+        SELECT <include refid="Base_Column_List"/> FROM sys_setting WHERE id = #{id}
+    </select>
+
+    <select id="selectAll" resultType="Setting">
+        SELECT <include refid="Base_Column_List"/> FROM sys_setting ORDER BY create_time DESC
+    </select>
+
+    <update id="update" parameterType="Setting">
+        UPDATE sys_setting
+        <set>
+            <if test="settingKey != null">setting_key = #{settingKey},</if>
+            <if test="settingValue != null">setting_value = #{settingValue},</if>
+            <if test="description != null">description = #{description},</if>
+        </set>
+        WHERE id = #{id}
+    </update>
+
+    <delete id="deleteById">
+        DELETE FROM sys_setting WHERE id = #{id}
+    </delete>
+
+</mapper>

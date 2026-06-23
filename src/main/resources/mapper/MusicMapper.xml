@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.leleo.blog.mapper.MusicMapper">
+
+    <sql id="Base_Column_List">
+        id, title, artist, url, cover, lyrics, sort, status, create_time
+    </sql>
+
+    <select id="selectEnabledList" resultType="Music">
+        SELECT <include refid="Base_Column_List"/>
+        FROM blog_music
+        WHERE status = 1
+        ORDER BY sort ASC, create_time DESC
+    </select>
+
+    <select id="selectAllOrderBySort" resultType="Music">
+        SELECT <include refid="Base_Column_List"/>
+        FROM blog_music
+        ORDER BY sort ASC, create_time DESC
+    </select>
+
+    <select id="selectById" resultType="Music">
+        SELECT <include refid="Base_Column_List"/> FROM blog_music WHERE id = #{id}
+    </select>
+
+    <select id="selectAll" resultType="Music">
+        SELECT <include refid="Base_Column_List"/> FROM blog_music ORDER BY sort ASC, create_time DESC
+    </select>
+
+    <insert id="insert" parameterType="Music" useGeneratedKeys="true" keyProperty="id">
+        INSERT INTO blog_music (title, artist, url, cover, lyrics, sort, status)
+        VALUES (#{title}, #{artist}, #{url}, #{cover}, #{lyrics}, #{sort}, #{status})
+    </insert>
+
+    <update id="update" parameterType="Music">
+        UPDATE blog_music
+        <set>
+            <if test="title != null">title = #{title},</if>
+            <if test="artist != null">artist = #{artist},</if>
+            <if test="url != null">url = #{url},</if>
+            <if test="cover != null">cover = #{cover},</if>
+            <if test="lyrics != null">lyrics = #{lyrics},</if>
+            <if test="sort != null">sort = #{sort},</if>
+            <if test="status != null">status = #{status},</if>
+        </set>
+        WHERE id = #{id}
+    </update>
+
+    <delete id="deleteById">
+        DELETE FROM blog_music WHERE id = #{id}
+    </delete>
+
+</mapper>
