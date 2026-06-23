@@ -32,7 +32,7 @@ function updateClock() {
     const clockDate = document.getElementById('clockDate');
     
     if (clockTime) clockTime.textContent = `${hours}:${minutes}:${seconds}`;
-    if (clockDate) clockDate.textContent = `${year}年${month}月${day}日 ${weekDay}`;
+    if (clockDate) clockDate.textContent = `${year}/${month}/${day}`;
 }
 updateClock();
 setInterval(updateClock, 1000);
@@ -140,4 +140,147 @@ function prevMusic() {
 
 function nextMusic() {
     console.log('下一曲');
+}
+
+// 贡献图日历功能
+function generateContributionGraph() {
+    const graph = document.getElementById('contributionGraph');
+    const months = document.getElementById('calendarMonths');
+    const title = document.getElementById('calendarTitle');
+    if (!graph || !title) return;
+
+    const today = new Date();
+    const oneYearAgo = new Date(today);
+    oneYearAgo.setFullYear(oneYearAgo.getFullYear() - 1);
+    
+    title.textContent = `${oneYearAgo.getFullYear()} - ${today.getFullYear()}`;
+
+    generateMonthLabels(oneYearAgo, today, months);
+
+    let html = '';
+    
+    const startDate = new Date(oneYearAgo);
+    startDate.setDate(startDate.getDate() - startDate.getDay());
+    
+    for (let weekDay = 0; weekDay < 7; weekDay++) {
+        let rowHtml = `<div class="graph-row">`;
+        
+        let currentDate = new Date(startDate);
+        currentDate.setDate(currentDate.getDate() + weekDay);
+        
+        while (currentDate <= today) {
+            const level = getRandomLevel();
+            let classes = `graph-cell level-${level}`;
+            
+            if (isToday(currentDate)) {
+                classes += ' today';
+            }
+            
+            rowHtml += `<div class="${classes}" title="${formatDate(currentDate)}: ${getLevelText(level)}"></div>`;
+            
+            currentDate.setDate(currentDate.getDate() + 7);
+        }
+        
+        rowHtml += `</div>`;
+        html += rowHtml;
+    }
+
+    graph.innerHTML = html;
+    
+    setupSyncScroll();
+}
+
+function setupSyncScroll() {
+    const graph = document.getElementById('contributionGraph');
+    const months = document.getElementById('calendarMonths');
+    
+    if (!graph || !months) return;
+    
+    graph.addEventListener('scroll', function() {
+        months.scrollLeft = graph.scrollLeft;
+    });
+    
+    months.addEventListener('scroll', function() {
+        graph.scrollLeft = months.scrollLeft;
+    });
+}
+
+function generateMonthLabels(startDate, endDate, container) {
+    if (!container) return;
+    
+    const monthNames = ['1月', '2月', '3月', '4月', '5月', '6月', '7月', '8月', '9月', '10月', '11月', '12月'];
+    
+    let html = '';
+    let currentMonth = -1;
+    const currentDate = new Date(startDate);
+    
+    while (currentDate <= endDate) {
+        const month = currentDate.getMonth();
+        const year = currentDate.getFullYear();
+        
+        if (month !== currentMonth) {
+            html += `<span class="month-label">${year}年${monthNames[month]}</span>`;
+            currentMonth = month;
+        }
+        
+        currentDate.setDate(currentDate.getDate() + 7);
+    }
+    
+    container.innerHTML = html;
+}
+
+function getWeeksInMonth(year, month, firstDayOffset) {
+    const firstDay = new Date(year, month, 1).getDay();
+    const lastDay = new Date(year, month + 1, 0).getDate();
+    
+    const adjustedFirstDay = (firstDay + (firstDayOffset > 0 ? (7 - firstDayOffset) : 0)) % 7;
+    const totalDays = adjustedFirstDay + lastDay;
+    
+    return Math.ceil(totalDays / 7);
+}
+
+function getRandomLevel() {
+    const rand = Math.random();
+    if (rand > 0.7) return 0;
+    if (rand > 0.5) return 1;
+    if (rand > 0.3) return 2;
+    if (rand > 0.1) return 3;
+    return 4;
+}
+
+function isToday(date) {
+    const today = new Date();
+    return date.getDate() === today.getDate() &&
+           date.getMonth() === today.getMonth() &&
+           date.getFullYear() === today.getFullYear();
+}
+
+function formatDate(date) {
+    return `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}-${String(date.getDate()).padStart(2, '0')}`;
+}
+
+function getLevelText(level) {
+    switch(level) {
+        case 0: return '无提交';
+        case 1: return '1-2 次提交';
+        case 2: return '3-5 次提交';
+        case 3: return '6-10 次提交';
+        case 4: return '10+ 次提交';
+        default: return '';
+    }
+}
+
+generateContributionGraph();
+
+// 按钮跳转事件
+function goToWrite() {
+    window.location.href = '/article/write';
+}
+
+function goToDrafts() {
+    window.location.href = '/article/drafts';
+}
+
+function goToStats() {
+    window.location.href = '/stats';
 }

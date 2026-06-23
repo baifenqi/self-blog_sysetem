@@ -9,6 +9,8 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpSession;
+import org.springframework.web.multipart.MultipartFile;
+import java.io.File;
 import java.util.List;
 import java.util.Map;
 
@@ -217,6 +219,86 @@ public class IndexController {
     @ResponseBody
     public Result<List<Music>> getMusicList() {
         return Result.success(musicService.selectEnabledList());
+    }
+
+    /**
+     * 获取网站背景设置API
+     */
+    @GetMapping("/api/setting/background")
+    @ResponseBody
+    public Result<String> getBackground() {
+        String background = settingService.getValue("background_image");
+        if (background == null || background.isEmpty()) {
+            background = "default";
+        }
+        return Result.success(background);
+    }
+
+    /**
+     * 保存网站背景设置API
+     */
+    @PostMapping("/api/setting/background")
+    @ResponseBody
+    public Result<String> saveBackground(@RequestBody Map<String, String> data, HttpSession session) {
+        User user = (User) session.getAttribute("user");
+        if (user == null || !"admin".equals(user.getRole())) {
+            return Result.unauthorized();
+        }
+
+        String background = data.get("background");
+        if (background == null) {
+            background = "default";
+        }
+
+        settingService.setValue("background_image", background);
+        return Result.success(background);
+    }
+
+    /**
+     * 上传背景图片API
+     */
+    @PostMapping("/api/setting/background/upload")
+    @ResponseBody
+    public Result<String> uploadBackground(@RequestParam("file") MultipartFile file) {
+        try {
+            // 检查文件类型
+            String contentType = file.getContentType();
+            if (contentType == null || !contentType.startsWith("image/")) {
+                return Result.error("请上传图片文件");
+            }
+
+            // 检查文件大小（最大 20MB）
+            if (file.getSize() > 20 * 1024 * 1024) {
+                return Result.error("图片大小不能超过 20MB");
+            }
+
+            // 获取上传目录
+            String uploadPath = System.getProperty("user.dir") + "/upload/backgrounds/";
+            File dir = new File(uploadPath);
+            if (!dir.exists()) {
+                dir.mkdirs();
+            }
+
+            // 生成文件名
+            String originalFilename = file.getOriginalFilename();
+            String extension = originalFilename != null && originalFilename.contains(".")
+                    ? originalFilename.substring(originalFilename.lastIndexOf("."))
+                    : ".png";
+            String filename = "bg_" + System.currentTimeMillis() + extension;
+
+            // 保存文件
+            File destFile = new File(uploadPath + filename);
+            file.transferTo(destFile);
+
+            // 保存设置
+            String backgroundUrl = "/upload/backgrounds/" + filename;
+            settingService.setValue("background_image", backgroundUrl);
+
+            return Result.success(backgroundUrl);
+        } catch (Exception e) {
+            e.printStackTrace();
+            return Result.error("上传失败: " + e.getMessage());
+        }
     }
 
     /**

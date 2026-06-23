@@ -38,7 +38,7 @@ public interface BaseMapper<T extends BaseEntity> {
     /**
      * 根据ID物理删除
      */
-    int物理删除ById(@Param("id") Long id);
+    int physicalDeleteById(@Param("id") Long id);
 
     /**
      * 批量插入

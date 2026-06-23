@@ -1,6 +1,7 @@
 package com.leleo.blog.controller;
 
 import com.leleo.blog.common.Constants;
+import com.leleo.blog.common.PageResult;
 import com.leleo.blog.common.Result;
 import com.leleo.blog.entity.*;
 import com.leleo.blog.service.*;
@@ -108,7 +109,7 @@ public class AdminController {
      */
     @GetMapping("/article/data")
     @ResponseBody
-    public Map<String, Object> articleData(
+    public PageResult<Article> articleData(
             @RequestParam(required = false) String keyword,
             @RequestParam(required = false) Long categoryId,
             @RequestParam(defaultValue = "1") Integer pageNum,
@@ -295,7 +296,7 @@ public class AdminController {
     @GetMapping("/user/list")
     @ResponseBody
     public List<User> userList() {
-        return userService.selectAll();
+        return userService.selectByRole(null);
     }
 
     /**
