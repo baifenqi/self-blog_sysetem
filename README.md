@@ -254,22 +254,8 @@ public class UserController {
 
 检查 `spring-mvc.xml` 中的拦截器配置，确保登录页和静态资源被排除。
 
-## 更新日志
 
-### v1.0.0 (2025-01-01)
 
-- 初始化项目结构
-- 实现文章、分类、标签管理功能
-- 实现评论功能
-- 实现音乐播放器功能
-- 实现用户注册登录功能
-- 实现后台管理系统
-
-## 联系方式
-
-- 作者：LELEO
-- 邮箱：admin@example.com
-- GitHub：https://github.com/leleo886
 
 ## 许可证
 
