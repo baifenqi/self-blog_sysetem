@@ -7,7 +7,15 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>${siteName != null ? siteName : 'LELEO'} - 个人博客</title>
-    <link rel="stylesheet" href="${pageContext.request.contextPath}/static/css/front.css">
+    <link rel="stylesheet" href="${pageContext.request.contextPath}/static/css/variables.css">
+    <link rel="stylesheet" href="${pageContext.request.contextPath}/static/css/base.css">
+    <link rel="stylesheet" href="${pageContext.request.contextPath}/static/css/navbar.css">
+    <link rel="stylesheet" href="${pageContext.request.contextPath}/static/css/layout.css">
+    <link rel="stylesheet" href="${pageContext.request.contextPath}/static/css/calendar.css">
+    <link rel="stylesheet" href="${pageContext.request.contextPath}/static/css/article.css">
+    <link rel="stylesheet" href="${pageContext.request.contextPath}/static/css/widgets.css">
+    <link rel="stylesheet" href="${pageContext.request.contextPath}/static/css/settings.css">
+    <link rel="stylesheet" href="${pageContext.request.contextPath}/static/css/responsive.css">
 </head>
 <body>
     <div class="bg-container" id="bgContainer">
@@ -66,9 +74,24 @@
                     <div class="music-popup">
                         <h4 id="musicTitle">Starry Sky</h4>
                         <div class="music-controls">
-                            <div class="music-btn" onclick="prevMusic()">&#9668;&#9668;</div>
-                            <div class="music-btn play" id="playBtn">&#9616;&#9612;</div>
-                            <div class="music-btn" onclick="nextMusic()">&#9658;&#9658;</div>
+                            <div class="music-btn prev" onclick="prevMusic()">
+                                <svg viewBox="0 0 24 24" fill="currentColor" width="18" height="18">
+                                    <path d="M6 6h2v12H6zm3.5 6l8.5 6V6z"/>
+                                </svg>
+                            </div>
+                            <div class="music-btn play" id="playBtn">
+                                <svg class="icon-play" viewBox="0 0 24 24" fill="currentColor" width="22" height="22">
+                                    <path d="M8 5v14l11-7z"/>
+                                </svg>
+                                <svg class="icon-pause" viewBox="0 0 24 24" fill="currentColor" width="22" height="22" style="display:none;">
+                                    <path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z"/>
+                                </svg>
+                            </div>
+                            <div class="music-btn next" onclick="nextMusic()">
+                                <svg viewBox="0 0 24 24" fill="currentColor" width="18" height="18">
+                                    <path d="M6 18l8.5-6L6 6v12zM16 6v12h2V6h-2z"/>
+                                </svg>
+                            </div>
                         </div>
                         <div class="music-progress">
                             <div class="music-progress-bar" id="musicProgressBar"></div>
@@ -79,9 +102,8 @@
                         </div>
                         <div class="music-list" id="musicList">
                             <c:forEach items="${musicList}" var="music" varStatus="status">
-                                <div class="music-item ${status.first ? 'active' : ''}" data-url="${music.url}" data-title="${music.title}" data-cover="${music.cover}">
+                                <div class="music-item ${status.first ? 'active' : ''}" data-url="${pageContext.request.contextPath}${music.url}" data-title="${music.title}" data-cover="${music.cover}">
                                     <div class="music-item-title">${music.title}</div>
-                                    <div class="music-item-artist">${music.artist}</div>
                                 </div>
                             </c:forEach>
                         </div>
@@ -258,9 +280,8 @@
                 <h4>音乐播放列表</h4>
                 <div class="music-list">
                     <c:forEach items="${musicList}" var="music">
-                        <div class="music-item" data-url="${music.url}">
+                        <div class="music-item" data-url="${pageContext.request.contextPath}${music.url}">
                             <div class="music-item-title">${music.title}</div>
-                            <div class="music-item-artist">${music.artist}</div>
                         </div>
                     </c:forEach>
                 </div>
@@ -268,129 +289,16 @@
         </div>
     </div>
 
-    <script src="${pageContext.request.contextPath}/static/js/front.js"></script>
     <script>
-        // ==================== 背景设置功能 ====================
-
-        // 设置背景样式
-        function setBackground(type) {
-            const bgContainer = document.querySelector('.bg-container');
-            if (!bgContainer) return;
-
-            let bgStyle = '';
-
-            switch(type) {
-                case 'default':
-                    bgStyle = 'radial-gradient(ellipse at 15% 15%, rgba(0,217,255,0.12) 0%, transparent 50%), radial-gradient(ellipse at 85% 85%, rgba(255,107,157,0.1) 0%, transparent 50%), #0a0a1a';
-                    break;
-                case 'aurora':
-                    bgStyle = 'linear-gradient(180deg, #0a0a1a 0%, #1a0a2e 50%, #0a1a0a 100%)';
-                    break;
-                case 'ocean':
-                    bgStyle = 'linear-gradient(180deg, #0a1628 0%, #1e3a5f 50%, #2d5a7b 100%)';
-                    break;
-                case 'violet':
-                    bgStyle = 'linear-gradient(180deg, #1a0a2e 0%, #2d1b4e 50%, #4a2d6b 100%)';
-                    break;
-                case 'preset1':
-                    bgStyle = `url('${pageContext.request.contextPath}/static/images/backgrounds/【哲风壁纸】你的名字-流星.png') no-repeat center center fixed`;
-                    break;
-                case 'preset2':
-                    bgStyle = `url('${pageContext.request.contextPath}/static/images/backgrounds/【哲风壁纸】动漫-动漫少女-少女.png') no-repeat center center fixed`;
-                    break;
-                default:
-                    bgStyle = 'radial-gradient(ellipse at 15% 15%, rgba(0,217,255,0.12) 0%, transparent 50%), radial-gradient(ellipse at 85% 85%, rgba(255,107,157,0.1) 0%, transparent 50%), #0a0a1a';
-            }
-
-            bgContainer.style.background = bgStyle;
-            bgContainer.style.backgroundSize = 'cover';
-            bgContainer.style.backgroundPosition = 'center';
-
-            // 更新预览选中状态
-            const bgTab = document.getElementById('bg');
-            if (bgTab) {
-                bgTab.querySelectorAll('.preview-item').forEach(item => item.classList.remove('active'));
-                const targetItem = bgTab.querySelector(`[data-bg="${type}"]`);
-                if (targetItem) targetItem.classList.add('active');
-            }
-
-            // 保存到服务器
-            fetch('/blog/api/setting/background', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ background: type })
-            })
-            .then(res => res.json())
-            .then(data => {
-                if (data.code === 200) {
-                    console.log('背景已保存');
-                }
-            })
-            .catch(err => {
-                console.error('保存背景失败:', err);
-            });
-        }
-
-        // 从服务器加载当前背景
-        function loadCurrentBackground() {
-            fetch('/blog/api/setting/background')
-            .then(res => res.json())
-            .then(data => {
-                if (data.code === 200 && data.data) {
-                    setBackground(data.data);
-                }
-            })
-            .catch(err => {
-                console.error('加载背景失败:', err);
-            });
-        }
-
-        // 上传自定义背景
-        function uploadBackground(input) {
-            if (!input.files || !input.files[0]) return;
-
-            const formData = new FormData();
-            formData.append('file', input.files[0]);
-
-            fetch('/blog/api/setting/background/upload', {
-                method: 'POST',
-                body: formData
-            })
-            .then(res => res.json())
-            .then(data => {
-                if (data.code === 200) {
-                    const bgContainer = document.querySelector('.bg-container');
-                    if (bgContainer) {
-                        bgContainer.style.background = `url('${data.data}') no-repeat center center fixed`;
-                        bgContainer.style.backgroundSize = 'cover';
-                    }
-                    alert('背景上传成功！');
-                } else {
-                    alert(data.msg || '上传失败');
-                }
-            })
-            .catch(err => {
-                console.error('上传失败:', err);
-                alert('上传失败');
-            });
-        }
-
-        // 初始化背景设置
-        document.addEventListener('DOMContentLoaded', () => {
-            // 延迟加载背景，确保DOM已完全加载
-            setTimeout(loadCurrentBackground, 500);
-        });
-
-        // 绑定背景预览项点击事件
-        document.addEventListener('click', (e) => {
-            const previewItem = e.target.closest('.preview-item');
-            if (previewItem && !previewItem.querySelector('input')) {
-                const bgType = previewItem.dataset.bg;
-                if (bgType) {
-                    setBackground(bgType);
-                }
-            }
-        });
+        const contextPath = '${pageContext.request.contextPath}';
     </script>
+    <script src="${pageContext.request.contextPath}/static/js/modules/clock.js"></script>
+    <script src="${pageContext.request.contextPath}/static/js/modules/settings.js"></script>
+    <script src="${pageContext.request.contextPath}/static/js/modules/background.js"></script>
+    <script src="${pageContext.request.contextPath}/static/js/modules/calendar.js"></script>
+    <script src="${pageContext.request.contextPath}/static/js/modules/music.js"></script>
+    <script src="${pageContext.request.contextPath}/static/js/modules/search.js"></script>
+    <script src="${pageContext.request.contextPath}/static/js/modules/navigation.js"></script>
+    <script src="${pageContext.request.contextPath}/static/js/front.js"></script>
 </body>
 </html>

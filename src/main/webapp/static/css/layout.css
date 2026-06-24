@@ -1,0 +1,59 @@
+.main-content {
+    position: relative;
+    z-index: 1;
+    min-height: 100vh;
+    display: flex;
+    gap: 30px;
+    padding-top: 60px;
+    padding-left: 30px;
+    padding-right: 30px;
+}
+
+.left-panel {
+    position: sticky;
+    top: 90px;
+    width: 200px;
+    flex-shrink: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+    z-index: 10;
+    max-height: calc(100vh - 120px);
+    align-self: flex-start;
+}
+
+.left-main {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 15px;
+}
+
+.left-widgets {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.center-panel {
+    flex: 1;
+    min-width: 0;
+    padding: 0;
+    padding-right: 15px;
+    scrollbar-width: thin;
+    scrollbar-color: rgba(0,217,255,0.2) rgba(255,255,255,0.02);
+}
+
+.center-panel::-webkit-scrollbar {
+    width: 6px;
+}
+
+.center-panel::-webkit-scrollbar-track {
+    background: rgba(255,255,255,0.02);
+    border-radius: 3px;
+}
+
+.center-panel::-webkit-scrollbar-thumb {
+    background: rgba(0,217,255,0.2);
+    border-radius: 3px;
+}

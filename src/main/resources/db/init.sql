@@ -160,3 +160,11 @@ INSERT INTO `sys_setting` (`setting_key`, `setting_value`, `description`) VALUES
 ('site_description', '个人技术博客', '网站描述'),
 ('avatar', NULL, '用户默认头像'),
 ('background_image', NULL, '背景图片');
+
+-- 插入示例音乐
+INSERT INTO `blog_music` (`title`, `artist`, `url`, `cover`, `sort`, `status`) VALUES
+('Starry Sky', 'Unknown Artist', '/static/music/sample1.mp3', 'https://picsum.photos/200/200?random=1', 1, 1),
+('Night Dreams', 'Unknown Artist', '/static/music/sample2.mp3', 'https://picsum.photos/200/200?random=2', 2, 1),
+('Ocean Waves', 'Unknown Artist', '/static/music/sample3.mp3', 'https://picsum.photos/200/200?random=3', 3, 1),
+('Forest Morning', 'Unknown Artist', '/static/music/sample4.mp3', 'https://picsum.photos/200/200?random=4', 4, 1),
+('City Lights', 'Unknown Artist', '/static/music/sample5.mp3', 'https://picsum.photos/200/200?random=5', 5, 1);

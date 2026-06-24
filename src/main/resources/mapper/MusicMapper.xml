@@ -51,4 +51,14 @@
         DELETE FROM blog_music WHERE id = #{id}
     </delete>
 
+    <select id="selectByUrl" resultType="Music">
+        SELECT <include refid="Base_Column_List"/>
+        FROM blog_music
+        WHERE url = #{url}
+    </select>
+
+    <select id="selectCount" resultType="int">
+        SELECT COUNT(*) FROM blog_music
+    </select>
+
 </mapper>

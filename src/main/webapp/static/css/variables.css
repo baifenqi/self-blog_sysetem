@@ -1,0 +1,12 @@
+:root {
+    --primary: #00d9ff;
+    --secondary: #ff6b9d;
+    --dark: #0a0a1a;
+    --card: rgba(10,10,20,0.45);
+    --card-light: rgba(15,15,30,0.35);
+    --text: #ffffff;
+    --muted: rgba(255,255,255,0.98);
+    --border: rgba(255,255,255,0.08);
+    --font-weight: 520;
+    --font-weight-bold: 620;
+}

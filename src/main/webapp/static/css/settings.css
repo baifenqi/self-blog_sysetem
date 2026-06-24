@@ -1,0 +1,156 @@
+.modal-overlay {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0,0,0,0.6);
+    backdrop-filter: blur(5px);
+    z-index: 1000;
+}
+
+.modal-overlay.active {
+    display: block;
+}
+
+.settings-modal {
+    display: none;
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background: rgba(10,10,26,0.95);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    padding: 25px;
+    width: 450px;
+    z-index: 1001;
+}
+
+.settings-modal.active {
+    display: block;
+}
+
+.modal-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+    padding-bottom: 12px;
+    border-bottom: 1px solid var(--border);
+}
+
+.modal-header h3 {
+    font-size: 16px;
+    font-weight: 500;
+}
+
+.modal-close {
+    width: 28px;
+    height: 28px;
+    border-radius: 50%;
+    background: rgba(255,255,255,0.05);
+    border: none;
+    color: var(--muted);
+    cursor: pointer;
+    font-size: 12px;
+    transition: all 0.2s;
+}
+
+.modal-close:hover {
+    background: rgba(255,87,108,0.2);
+    color: #ff576c;
+}
+
+.tabs {
+    display: flex;
+    gap: 6px;
+    margin-bottom: 20px;
+    border-bottom: 1px solid var(--border);
+}
+
+.tab {
+    padding: 6px 16px;
+    border: none;
+    background: none;
+    color: var(--muted);
+    cursor: pointer;
+    font-size: 12px;
+    border-bottom: 2px solid transparent;
+    margin-bottom: -1px;
+    transition: all 0.2s;
+}
+
+.tab.active {
+    color: var(--primary);
+    border-bottom-color: var(--primary);
+}
+
+.setting-section {
+    display: none;
+}
+
+.setting-section.active {
+    display: block;
+}
+
+.setting-section h4 {
+    font-size: 12px;
+    color: var(--muted);
+    margin-bottom: 12px;
+}
+
+.preview-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 8px;
+}
+
+.preview-item {
+    aspect-ratio: 16/10;
+    border-radius: 8px;
+    background: linear-gradient(135deg, rgba(0,217,255,0.1), rgba(255,107,157,0.1));
+    cursor: pointer;
+    border: 2px solid transparent;
+    transition: all 0.2s;
+}
+
+.preview-item:hover, .preview-item.active {
+    border-color: var(--primary);
+}
+
+.music-list {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.music-item {
+    padding: 10px;
+    background: rgba(30,30,50,0.6);
+    border-radius: 8px;
+    cursor: pointer;
+    border: 1px solid rgba(255,255,255,0.08);
+    transition: all 0.2s;
+}
+
+.music-item:hover {
+    border-color: rgba(0,217,255,0.2);
+}
+
+.music-item.active {
+    background: rgba(0,217,255,0.08);
+    border-color: rgba(0,217,255,0.3);
+}
+
+.music-item-title {
+    font-size: 12px;
+    color: var(--text);
+}
+
+.music-item-artist {
+    font-size: 10px;
+    color: var(--muted);
+    margin-top: 2px;
+}
