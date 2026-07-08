@@ -108,12 +108,14 @@
 }
 
 .preview-item {
+    position: relative;
     aspect-ratio: 16/10;
     border-radius: 8px;
     background: linear-gradient(135deg, rgba(0,217,255,0.1), rgba(255,107,157,0.1));
     cursor: pointer;
     border: 2px solid transparent;
     transition: all 0.2s;
+    overflow: hidden;
 }
 
 .preview-item:hover, .preview-item.active {

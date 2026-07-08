@@ -29,10 +29,20 @@ body {
     width: 100%;
     height: 100%;
     z-index: -1;
+    overflow: hidden;
     background: radial-gradient(ellipse at 15% 15%, rgba(0,217,255,0.12) 0%, transparent 50%),
                 radial-gradient(ellipse at 85% 85%, rgba(255,107,157,0.1) 0%, transparent 50%),
                 var(--dark);
     transition: background 0.5s ease;
+}
+
+.bg-container video.bg-video {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    position: absolute;
+    top: 0;
+    left: 0;
 }
 
 .navbar {
@@ -266,7 +276,7 @@ body {
     display: flex;
     align-items: center;
     justify-content: center;
-    color: var(--muted);
+    color: rgba(255,255,255,0.95);
     text-decoration: none;
     font-size: 14px;
     transition: all 0.2s;
@@ -1070,12 +1080,14 @@ body {
 }
 
 .preview-item {
+    position: relative;
     aspect-ratio: 16/10;
     border-radius: 8px;
     background: linear-gradient(135deg, rgba(0,217,255,0.1), rgba(255,107,157,0.1));
     cursor: pointer;
     border: 2px solid transparent;
     transition: all 0.2s;
+    overflow: hidden;
 }
 
 .preview-item:hover, .preview-item.active {

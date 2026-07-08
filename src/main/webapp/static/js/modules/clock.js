@@ -3,7 +3,7 @@
  * 负责实时更新时间显示
  */
 
-const ClockModule = {
+var ClockModule = {
     init() {
         this.update();
         setInterval(() => this.update(), 1000);

@@ -14,29 +14,74 @@
     <link rel="stylesheet" href="${pageContext.request.contextPath}/static/css/calendar.css">
     <link rel="stylesheet" href="${pageContext.request.contextPath}/static/css/article.css">
     <link rel="stylesheet" href="${pageContext.request.contextPath}/static/css/widgets.css">
-    <link rel="stylesheet" href="${pageContext.request.contextPath}/static/css/settings.css">
+    <link rel="stylesheet" href="${pageContext.request.contextPath}/static/css/settings.css?v=2026070802">
     <link rel="stylesheet" href="${pageContext.request.contextPath}/static/css/responsive.css">
+    <style>
+        .bg-container video.bg-video {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            position: absolute;
+            top: 0;
+            left: 0;
+        }
+        .music-upload-btn {
+            margin-bottom: 10px;
+            padding: 6px 14px;
+            border: 1px solid rgba(255,255,255,0.1);
+            background: rgba(255,255,255,0.05);
+            color: rgba(255,255,255,0.98);
+            border-radius: 6px;
+            font-size: 12px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        .music-upload-btn:hover {
+            background: rgba(0,217,255,0.15);
+            border-color: #00d9ff;
+            color: #00d9ff;
+        }
+        .music-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .music-item-title {
+            flex: 1;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+        .music-delete-btn {
+            padding: 4px 8px;
+            border: 1px solid rgba(255,87,108,0.2);
+            background: rgba(255,87,108,0.05);
+            color: rgba(255,87,108,0.8);
+            border-radius: 4px;
+            font-size: 10px;
+            cursor: pointer;
+            transition: all 0.2s;
+            margin-left: 8px;
+            flex-shrink: 0;
+        }
+        .music-delete-btn:hover {
+            background: rgba(255,87,108,0.15);
+            border-color: #ff576c;
+            color: #ff576c;
+        }
+    </style>
 </head>
 <body>
     <div class="bg-container" id="bgContainer">
     </div>
 
     <nav class="navbar">
-        <div class="navbar-brand" onclick="location.href='/'">${siteName != null ? siteName : 'LELEO'}</div>
+        <div class="navbar-brand" onclick="location.href='/'">BLOG</div>
         <div class="navbar-search">
             <input type="text" placeholder="搜索文章..." id="searchInput">
         </div>
         <div class="navbar-user">
-            <c:choose>
-                <c:when test="${not empty sessionScope.user}">
-                    <div class="navbar-avatar" title="点击进入个人信息页"
-                         onclick="location.href='/user/profile'"></div>
-                </c:when>
-                <c:otherwise>
-                    <div class="navbar-avatar" title="点击登录"
-                         onclick="location.href='/login'"></div>
-                </c:otherwise>
-            </c:choose>
+            <div class="settings-btn" id="settingsBtn">&#9881;</div>
         </div>
     </nav>
 
@@ -61,13 +106,25 @@
                 </div>
 
                 <div class="social-links">
-                    <a href="#" class="social-link" title="GitHub">G</a>
-                    <a href="#" class="social-link" title="Email">E</a>
-                    <a href="#" class="social-link" title="Twitter">T</a>
-                    <a href="#" class="social-link" title="YouTube">Y</a>
+                    <!-- GitHub -->
+                    <a href="https://github.com/baifenqi" class="social-link" title="GitHub" target="_blank" rel="noopener" data-platform="github">
+                        <svg viewBox="0 0 24 24" fill="currentColor" width="24" height="24" aria-hidden="true" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M12 .297c-6.63 0-12 5.373-12 12 0 5.303 3.438 9.8 8.205 11.385.6.113.82-.258.82-.577 0-.285-.01-1.04-.015-2.04-3.338.724-4.042-1.61-4.042-1.61C4.422 18.07 3.633 17.7 3.633 17.7c-1.087-.744.084-.729.084-.729 1.205.084 1.838 1.236 1.838 1.236 1.07 1.835 2.809 1.305 3.495.998.108-.776.417-1.305.76-1.605-2.665-.3-5.466-1.332-5.466-5.93 0-1.31.465-2.38 1.235-3.22-.135-.303-.54-1.523.105-3.176 0 0 1.005-.322 3.3 1.23.96-.267 1.98-.4 3-.405 1.02.005 2.04.138 3 .405 2.28-1.552 3.285-1.23 3.285-1.23.645 1.653.24 2.873.12 3.176.765.84 1.23 1.91 1.23 3.22 0 4.61-2.805 5.625-5.475 5.92.42.36.81 1.096.81 2.22 0 1.606-.015 2.896-.015 3.286 0 .315.21.69.825.57C20.565 22.092 24 17.592 24 12.297c0-6.627-5.373-12-12-12"/>
+                        </svg>
+                    </a>
+                    <!-- QQ -->
+                    <a href="https://im.qq.com/" class="social-link" title="QQ" target="_blank" rel="noopener" data-platform="qq">
+                        <img src="https://cdn.simpleicons.org/qq/ffffff" width="24" height="24" alt="QQ" />
+                    </a>
+                    <!-- 微信 -->
+                    <a href="weixin://" class="social-link" title="微信" target="_blank" rel="noopener" data-platform="wechat">
+                        <img src="https://cdn.simpleicons.org/wechat/ffffff" width="24" height="24" alt="微信" />
+                    </a>
+                    <!-- B站 -->
+                    <a href="https://www.bilibili.com/" class="social-link" title="B站" target="_blank" rel="noopener" data-platform="bilibili">
+                        <img src="https://cdn.simpleicons.org/bilibili/ffffff" width="24" height="24" alt="B站" />
+                    </a>
                 </div>
-
-                <div class="settings-btn" id="settingsBtn">&#9881;</div>
 
                 <div class="music-player">
                     <div class="music-cover" id="musicCover"></div>
@@ -235,70 +292,46 @@
         </div>
         <div class="settings-content">
             <div class="setting-section active" id="bg">
-                <h4>背景设置</h4>
-                <div class="preview-grid">
-                    <!-- 默认背景 -->
-                    <div class="preview-item active" data-bg="default"
-                         style="background: radial-gradient(ellipse at 15% 15%, rgba(0,217,255,0.12) 0%, transparent 50%), radial-gradient(ellipse at 85% 85%, rgba(255,107,157,0.1) 0%, transparent 50%), #0a0a1a;"
-                         title="默认星空"></div>
+                <h5 style="color: var(--muted); font-size: 12px; margin: 0 0 10px; font-weight: normal;">系统背景</h5>
+                <div class="preview-grid" id="systemBgGrid"></div>
 
-                    <!-- 极光背景 -->
-                    <div class="preview-item" data-bg="aurora"
-                         style="background: linear-gradient(180deg, #0a0a1a 0%, #1a0a2e 50%, #0a1a0a 100%);"
-                         title="极光"></div>
-
-                    <!-- 海洋背景 -->
-                    <div class="preview-item" data-bg="ocean"
-                         style="background: linear-gradient(180deg, #0a1628 0%, #1e3a5f 50%, #2d5a7b 100%);"
-                         title="海洋"></div>
-
-                    <!-- 紫罗兰背景 -->
-                    <div class="preview-item" data-bg="violet"
-                         style="background: linear-gradient(180deg, #1a0a2e 0%, #2d1b4e 50%, #4a2d6b 100%);"
-                         title="紫罗兰"></div>
-
-                    <!-- 预设图片1：你的名字-流星 -->
-                    <div class="preview-item" data-bg="preset1"
-                         style="background: url('${pageContext.request.contextPath}/static/images/backgrounds/【哲风壁纸】你的名字-流星.png') no-repeat center center; background-size: cover;"
-                         title="你的名字"></div>
-
-                    <!-- 预设图片2：动漫少女 -->
-                    <div class="preview-item" data-bg="preset2"
-                         style="background: url('${pageContext.request.contextPath}/static/images/backgrounds/【哲风壁纸】动漫-动漫少女-少女.png') no-repeat center center; background-size: cover;"
-                         title="动漫少女"></div>
-
-                    <!-- 自定义上传 -->
+                <h5 style="color: var(--muted); font-size: 12px; margin: 20px 0 10px; font-weight: normal;">我的背景</h5>
+                <div class="preview-grid" id="localBgGrid">
                     <label class="preview-item" style="background: rgba(255,255,255,0.1); display: flex; align-items: center; justify-content: center; font-size: 24px; cursor: pointer;"
                            title="上传自定义背景" onclick="document.getElementById('bgUpload').click()">
                         📁
                     </label>
                 </div>
-                <input type="file" id="bgUpload" accept="image/*" style="display: none;" onchange="uploadBackground(this)">
-                <p style="font-size: 11px; color: var(--muted); margin-top: 10px;">支持 JPG、PNG、GIF 格式，最大 20MB</p>
+                <input type="file" id="bgUpload" accept="image/*,video/mp4" style="display: none;" onchange="uploadBackground(this)">
+                <p style="font-size: 11px; color: var(--muted); margin-top: 10px;">支持 JPG、PNG、GIF、MP4 格式，最大 20MB</p>
             </div>
             <div class="setting-section" id="music">
                 <h4>音乐播放列表</h4>
-                <div class="music-list">
+                <button class="music-upload-btn" onclick="document.getElementById('musicUpload').click()">+ 添加音乐</button>
+                <input type="file" id="musicUpload" accept="audio/*" style="display: none;" onchange="uploadMusic(this)">
+                <div class="music-list" id="musicSettingsList">
                     <c:forEach items="${musicList}" var="music">
-                        <div class="music-item" data-url="${pageContext.request.contextPath}${music.url}">
+                        <div class="music-item" data-id="${music.id}" data-url="${pageContext.request.contextPath}${music.url}">
                             <div class="music-item-title">${music.title}</div>
+                            <button class="music-delete-btn" onclick="deleteMusic(${music.id}, this)">删除</button>
                         </div>
                     </c:forEach>
                 </div>
+                <p style="font-size: 11px; color: var(--muted); margin-top: 10px;">支持 MP3、WAV、OGG、FLAC 格式，最大 50MB</p>
             </div>
         </div>
     </div>
 
     <script>
-        const contextPath = '${pageContext.request.contextPath}';
+        var contextPath = '${pageContext.request.contextPath}';
     </script>
-    <script src="${pageContext.request.contextPath}/static/js/modules/clock.js"></script>
-    <script src="${pageContext.request.contextPath}/static/js/modules/settings.js"></script>
-    <script src="${pageContext.request.contextPath}/static/js/modules/background.js"></script>
-    <script src="${pageContext.request.contextPath}/static/js/modules/calendar.js"></script>
-    <script src="${pageContext.request.contextPath}/static/js/modules/music.js"></script>
-    <script src="${pageContext.request.contextPath}/static/js/modules/search.js"></script>
-    <script src="${pageContext.request.contextPath}/static/js/modules/navigation.js"></script>
-    <script src="${pageContext.request.contextPath}/static/js/front.js"></script>
+    <script src="${pageContext.request.contextPath}/static/js/modules/clock.js?v=20250101"></script>
+    <script src="${pageContext.request.contextPath}/static/js/modules/settings.js?v=20250101"></script>
+    <script src="${pageContext.request.contextPath}/static/js/modules/background.js?v=2026070801"></script>
+    <script src="${pageContext.request.contextPath}/static/js/modules/calendar.js?v=20250101"></script>
+    <script src="${pageContext.request.contextPath}/static/js/modules/music.js?v=2026070801"></script>
+    <script src="${pageContext.request.contextPath}/static/js/modules/search.js?v=20250101"></script>
+    <script src="${pageContext.request.contextPath}/static/js/modules/navigation.js?v=20250101"></script>
+    <script src="${pageContext.request.contextPath}/static/js/front-v2.js"></script>
 </body>
 </html>

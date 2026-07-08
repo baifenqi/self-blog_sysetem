@@ -3,7 +3,7 @@
  * 负责处理搜索输入和导航
  */
 
-const SearchModule = {
+var SearchModule = {
     init() {
         this.bindEvents();
     },
