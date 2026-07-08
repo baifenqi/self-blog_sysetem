@@ -1,0 +1,102 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.leleo.blog.mapper.CommentMapper">
+
+    <sql id="Base_Column_List">
+        id, article_id, user_id, content, parent_id, is_deleted, create_time
+    </sql>
+
+    <resultMap id="BaseResultMap" type="Comment">
+        <id column="id" property="id"/>
+        <result column="article_id" property="articleId"/>
+        <result column="user_id" property="userId"/>
+        <result column="content" property="content"/>
+        <result column="parent_id" property="parentId"/>
+        <result column="is_deleted" property="isDeleted"/>
+        <result column="create_time" property="createTime"/>
+        <result column="username" property="username"/>
+        <result column="userAvatar" property="userAvatar"/>
+    </resultMap>
+
+    <select id="selectByArticleId" resultMap="BaseResultMap">
+        SELECT c.id, c.article_id, c.user_id, c.content, c.parent_id, c.is_deleted, c.create_time,
+               u.username, u.avatar as userAvatar
+        FROM blog_comment c
+        LEFT JOIN sys_user u ON c.user_id = u.id
+        WHERE c.article_id = #{articleId} AND c.is_deleted = 0
+        ORDER BY c.create_time DESC
+    </select>
+
+    <select id="selectTopLevelComments" resultMap="BaseResultMap">
+        SELECT c.id, c.article_id, c.user_id, c.content, c.parent_id, c.is_deleted, c.create_time,
+               u.username, u.avatar as userAvatar
+        FROM blog_comment c
+        LEFT JOIN sys_user u ON c.user_id = u.id
+        WHERE c.article_id = #{articleId} AND c.is_deleted = 0 AND c.parent_id IS NULL
+        ORDER BY c.create_time DESC
+    </select>
+
+    <select id="selectByParentId" resultMap="BaseResultMap">
+        SELECT c.id, c.article_id, c.user_id, c.content, c.parent_id, c.is_deleted, c.create_time,
+               u.username, u.avatar as userAvatar
+        FROM blog_comment c
+        LEFT JOIN sys_user u ON c.user_id = u.id
+        WHERE c.parent_id = #{parentId} AND c.is_deleted = 0
+        ORDER BY c.create_time ASC
+    </select>
+
+    <select id="selectStatistics" resultType="map">
+        SELECT COUNT(*) as totalComments FROM blog_comment WHERE is_deleted = 0
+    </select>
+
+    <select id="selectRecentComments" resultMap="BaseResultMap">
+        SELECT c.id, c.article_id, c.user_id, c.content, c.parent_id, c.is_deleted, c.create_time,
+               u.username, u.avatar as userAvatar
+        FROM blog_comment c
+        LEFT JOIN sys_user u ON c.user_id = u.id
+        WHERE c.is_deleted = 0
+        ORDER BY c.create_time DESC
+        LIMIT #{limit}
+    </select>
+
+    <select id="selectByUserId" resultMap="BaseResultMap">
+        SELECT <include refid="Base_Column_List"/>
+        FROM blog_comment
+        WHERE user_id = #{userId} AND is_deleted = 0
+        ORDER BY create_time DESC
+    </select>
+
+    <select id="selectById" resultMap="BaseResultMap">
+        SELECT c.id, c.article_id, c.user_id, c.content, c.parent_id, c.is_deleted, c.create_time,
+               u.username, u.avatar as userAvatar
+        FROM blog_comment c
+        LEFT JOIN sys_user u ON c.user_id = u.id
+        WHERE c.id = #{id}
+    </select>
+
+    <select id="selectAll" resultMap="BaseResultMap">
+        SELECT <include refid="Base_Column_List"/>
+        FROM blog_comment
+        WHERE is_deleted = 0
+        ORDER BY create_time DESC
+    </select>
+
+    <insert id="insert" parameterType="Comment" useGeneratedKeys="true" keyProperty="id">
+        INSERT INTO blog_comment (article_id, user_id, content, parent_id, is_deleted)
+        VALUES (#{articleId}, #{userId}, #{content}, #{parentId}, #{isDeleted})
+    </insert>
+
+    <update id="update" parameterType="Comment">
+        UPDATE blog_comment
+        <set>
+            <if test="content != null">content = #{content},</if>
+        </set>
+        WHERE id = #{id}
+    </update>
+
+    <update id="deleteById">
+        UPDATE blog_comment SET is_deleted = 1 WHERE id = #{id}
+    </update>
+
+</mapper>
