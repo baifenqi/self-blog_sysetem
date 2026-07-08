@@ -1,19 +1,9 @@
 package com.leleo.blog.controller;
 
 import com.leleo.blog.common.Result;
-import com.leleo.blog.entity.Article;
-import com.leleo.blog.entity.Category;
-import com.leleo.blog.entity.Comment;
-import com.leleo.blog.entity.Music;
-import com.leleo.blog.entity.Tag;
-import com.leleo.blog.entity.User;
-import com.leleo.blog.service.ArticleService;
-import com.leleo.blog.service.CategoryService;
-import com.leleo.blog.service.CommentService;
-import com.leleo.blog.service.MusicService;
-import com.leleo.blog.service.SettingService;
-import com.leleo.blog.service.TagService;
-import com.leleo.blog.service.UserService;
+import com.leleo.blog.entity.*;
+import com.leleo.blog.service.*;
+import com.leleo.blog.mapper.UserMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -50,6 +40,9 @@ public class IndexController {
 
     @Autowired
     private SettingService settingService;
+
+    @Autowired
+    private UserMapper userMapper;
 
     @Autowired
     private UserService userService;
@@ -386,5 +379,190 @@ public class IndexController {
         articleService.selectById(comment.getArticleId());
 
         return Result.success(id);
+    }
+
+    /**
+     * 用户资料页面
+     */
+    @GetMapping("/user/profile")
+    public String profile(HttpSession session) {
+        return "front/profile";
+    }
+
+    /**
+     * 账号安全页面
+     */
+    @GetMapping("/user/security")
+    public String security(HttpSession session) {
+        return "front/security";
+    }
+
+    /**
+     * 更新用户昵称API
+     */
+    @PostMapping("/api/user/profile/nickname")
+    @ResponseBody
+    public Result<String> updateNickname(@RequestBody Map<String, String> data, HttpSession session) {
+        User user = (User) session.getAttribute("user");
+        if (user == null) {
+            user = new User();
+        }
+
+        String nickname = data.get("nickname");
+        if (nickname == null || nickname.trim().isEmpty()) {
+            return Result.error("昵称不能为空");
+        }
+
+        user.setNickname(nickname.trim());
+        if (user.getId() != null) {
+            userService.update(user);
+        }
+        session.setAttribute("user", user);
+
+        return Result.success(nickname);
+    }
+
+    /**
+     * 更新用户签名API
+     */
+    @PostMapping("/api/user/profile/signature")
+    @ResponseBody
+    public Result<String> updateSignature(@RequestBody Map<String, String> data, HttpSession session) {
+        User user = (User) session.getAttribute("user");
+        if (user == null) {
+            user = new User();
+        }
+
+        String signature = data.get("signature");
+        user.setSignature(signature != null ? signature.trim() : null);
+        if (user.getId() != null) {
+            userService.update(user);
+        }
+        session.setAttribute("user", user);
+
+        return Result.success(signature);
+    }
+
+    /**
+     * 上传用户头像API
+     */
+    @PostMapping("/api/user/profile/avatar")
+    @ResponseBody
+    public Result<String> uploadAvatar(@RequestParam("file") MultipartFile file, HttpSession session) {
+        User user = (User) session.getAttribute("user");
+        if (user == null) {
+            user = new User();
+        }
+
+        try {
+            String contentType = file.getContentType();
+            if (contentType == null || !contentType.startsWith("image/")) {
+                return Result.error("请上传图片文件");
+            }
+
+            if (file.getSize() > 5 * 1024 * 1024) {
+                return Result.error("图片大小不能超过 5MB");
+            }
+
+            String uploadPath = System.getProperty("user.dir") + "/upload/avatars/";
+            File dir = new File(uploadPath);
+            if (!dir.exists()) {
+                dir.mkdirs();
+            }
+
+            String originalFilename = file.getOriginalFilename();
+            String extension = originalFilename != null && originalFilename.contains(".")
+                    ? originalFilename.substring(originalFilename.lastIndexOf("."))
+                    : ".png";
+            String filename = "avatar_" + (user.getId() != null ? user.getId() : "guest") + "_" + System.currentTimeMillis() + extension;
+
+            File destFile = new File(uploadPath + filename);
+            file.transferTo(destFile);
+
+            String avatarUrl = "/upload/avatars/" + filename;
+            user.setAvatar(avatarUrl);
+            if (user.getId() != null) {
+                userService.update(user);
+            }
+            session.setAttribute("user", user);
+
+            return Result.success(avatarUrl);
+        } catch (Exception e) {
+            e.printStackTrace();
+            return Result.error("上传失败: " + e.getMessage());
+        }
+    }
+
+    /**
+     * 修改密码API
+     */
+    @PostMapping("/api/user/profile/password")
+    @ResponseBody
+    public Result<String> changePassword(@RequestBody Map<String, String> data, HttpSession session) {
+        User user = (User) session.getAttribute("user");
+        if (user == null || user.getId() == null) {
+            return Result.error("请先登录");
+        }
+
+        String newPassword = data.get("newPassword");
+
+        if (newPassword == null || newPassword.trim().isEmpty()) {
+            return Result.error("请输入新密码");
+        }
+        if (newPassword.length() < 6) {
+            return Result.error("新密码长度不能少于6位");
+        }
+
+        User dbUser = userService.selectById(user.getId());
+        if (dbUser == null) {
+            return Result.error("用户不存在");
+        }
+
+        if (dbUser.getPassword().equals(newPassword)) {
+            return Result.error("新密码不能与旧密码相同");
+        }
+
+        user.setPassword(newPassword);
+        userService.update(user);
+        session.setAttribute("user", user);
+
+        return Result.success("密码修改成功");
+    }
+
+    /**
+     * 修改账号API
+     */
+    @PostMapping("/api/user/profile/username")
+    @ResponseBody
+    public Result<String> changeUsername(@RequestBody Map<String, String> data, HttpSession session) {
+        User user = (User) session.getAttribute("user");
+        if (user == null || user.getId() == null) {
+            return Result.error("请先登录");
+        }
+
+        String newUsername = data.get("newUsername");
+
+        if (newUsername == null || newUsername.trim().isEmpty()) {
+            return Result.error("请输入新账号");
+        }
+        if (newUsername.length() < 3) {
+            return Result.error("新账号长度不能少于3位");
+        }
+
+        User dbUser = userService.selectById(user.getId());
+        if (dbUser == null) {
+            return Result.error("用户不存在");
+        }
+
+        User existingUser = userMapper.selectByUsername(newUsername);
+        if (existingUser != null && !existingUser.getId().equals(user.getId())) {
+            return Result.error("该账号已被使用");
+        }
+
+        user.setUsername(newUsername);
+        userService.update(user);
+        session.setAttribute("user", user);
+
+        return Result.success("账号修改成功");
     }
 }

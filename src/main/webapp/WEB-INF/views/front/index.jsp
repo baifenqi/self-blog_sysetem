@@ -82,6 +82,9 @@
         </div>
         <div class="navbar-user">
             <div class="settings-btn" id="settingsBtn">&#9881;</div>
+            <div class="navbar-avatar" title="点击进入个人信息页"
+                 onclick="location.href='${pageContext.request.contextPath}/user/profile'"
+                 style="background: url('${sessionScope.user != null && sessionScope.user.avatar != null ? sessionScope.user.avatar : 'https://picsum.photos/40/40'}') center/cover;"></div>
         </div>
     </nav>
 
@@ -90,9 +93,9 @@
         <div class="left-panel">
             <div class="left-main">
                 <div class="avatar-container">
-                    <a href="#" class="avatar-wrapper" title="点击进入个人信息页">
-                        <img src="https://picsum.photos/90/90" alt="Avatar" class="avatar-img">
-                    </a>
+                    <div class="avatar-wrapper">
+                        <img src="${sessionScope.user != null && sessionScope.user.avatar != null ? sessionScope.user.avatar : 'https://picsum.photos/90/90'}" alt="Avatar" class="avatar-img">
+                    </div>
                     <div class="username">${sessionScope.user != null ? sessionScope.user.nickname : 'LELEO'}</div>
                 </div>
 
