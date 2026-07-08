@@ -49,4 +49,14 @@ public class MusicServiceImpl implements MusicService {
     public boolean deleteById(Long id) {
         return musicMapper.deleteById(id) > 0;
     }
+
+    @Override
+    public List<Music> selectByUrl(String url) {
+        return musicMapper.selectByUrl(url);
+    }
+
+    @Override
+    public int selectCount() {
+        return musicMapper.selectCount();
+    }
 }

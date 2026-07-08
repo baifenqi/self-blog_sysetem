@@ -1,8 +1,19 @@
 package com.leleo.blog.controller;
 
 import com.leleo.blog.common.Result;
-import com.leleo.blog.entity.*;
-import com.leleo.blog.service.*;
+import com.leleo.blog.entity.Article;
+import com.leleo.blog.entity.Category;
+import com.leleo.blog.entity.Comment;
+import com.leleo.blog.entity.Music;
+import com.leleo.blog.entity.Tag;
+import com.leleo.blog.entity.User;
+import com.leleo.blog.service.ArticleService;
+import com.leleo.blog.service.CategoryService;
+import com.leleo.blog.service.CommentService;
+import com.leleo.blog.service.MusicService;
+import com.leleo.blog.service.SettingService;
+import com.leleo.blog.service.TagService;
+import com.leleo.blog.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -210,15 +221,6 @@ public class IndexController {
     public String logout(HttpSession session) {
         session.removeAttribute("user");
         return "redirect:/";
-    }
-
-    /**
-     * 获取音乐列表API
-     */
-    @GetMapping("/api/music")
-    @ResponseBody
-    public Result<List<Music>> getMusicList() {
-        return Result.success(musicService.selectEnabledList());
     }
 
     /**

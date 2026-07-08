@@ -1,0 +1,194 @@
+/* 模态框基础 */
+.modal {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0,0,0,0.7);
+    backdrop-filter: blur(8px);
+    z-index: 300;
+    align-items: center;
+    justify-content: center;
+    animation: fadeIn 0.2s;
+}
+
+.modal.active {
+    display: flex;
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+}
+
+@keyframes slideUp {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.modal-content {
+    background: rgba(20,20,40,0.98);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    padding: 30px;
+    width: 90%;
+    max-width: 400px;
+    box-shadow: 0 20px 60px rgba(0,0,0,0.5);
+    animation: slideUp 0.3s;
+    position: relative;
+}
+
+.modal-close {
+    position: absolute;
+    top: 12px;
+    right: 12px;
+    width: 28px;
+    height: 28px;
+    background: rgba(255,255,255,0.06);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    color: rgba(255,255,255,0.7);
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 14px;
+    transition: all 0.2s;
+}
+
+.modal-close:hover {
+    background: rgba(255,107,157,0.2);
+    color: var(--secondary);
+}
+
+.modal-title {
+    font-size: 20px;
+    font-weight: 600;
+    margin-bottom: 20px;
+    text-align: center;
+    background: linear-gradient(135deg, var(--primary), var(--secondary));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+}
+
+.modal-subtitle {
+    font-size: 12px;
+    color: rgba(255,255,255,0.5);
+    text-align: center;
+    margin-bottom: 20px;
+    margin-top: -10px;
+}
+
+/* 表单 */
+.form-group {
+    margin-bottom: 14px;
+}
+
+.form-label {
+    display: block;
+    font-size: 12px;
+    color: rgba(255,255,255,0.7);
+    margin-bottom: 6px;
+    font-weight: 520;
+}
+
+.form-input {
+    width: 100%;
+    height: 40px;
+    background: rgba(30,30,50,0.6);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 0 14px;
+    color: var(--text);
+    font-size: 13px;
+    font-weight: 520;
+    transition: all 0.2s;
+}
+
+.form-input:focus {
+    outline: none;
+    border-color: rgba(0,217,255,0.4);
+    box-shadow: 0 0 12px rgba(0,217,255,0.1);
+}
+
+.form-input::placeholder {
+    color: rgba(255,255,255,0.3);
+}
+
+textarea.form-input {
+    height: auto;
+    min-height: 80px;
+    padding: 10px 14px;
+    resize: vertical;
+}
+
+/* 提交按钮 */
+.form-btn {
+    width: 100%;
+    height: 42px;
+    background: linear-gradient(135deg, var(--primary), var(--secondary));
+    border: none;
+    border-radius: 8px;
+    color: white;
+    font-size: 13px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s;
+    margin-top: 6px;
+}
+
+.form-btn:hover {
+    opacity: 0.9;
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(0,217,255,0.2);
+}
+
+.form-btn:active {
+    transform: translateY(0);
+}
+
+.form-btn:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+/* 表单底部链接 */
+.form-footer {
+    text-align: center;
+    margin-top: 14px;
+    font-size: 12px;
+    color: rgba(255,255,255,0.5);
+}
+
+.form-link {
+    color: var(--primary);
+    cursor: pointer;
+    text-decoration: none;
+    transition: opacity 0.2s;
+}
+
+.form-link:hover {
+    opacity: 0.8;
+    text-decoration: underline;
+}
+
+/* 错误信息 */
+.form-error {
+    color: #ff6b6b;
+    font-size: 11px;
+    margin-top: 4px;
+    display: none;
+}
+
+.form-error.active {
+    display: block;
+}

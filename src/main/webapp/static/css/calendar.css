@@ -1,0 +1,232 @@
+.dashboard-header {
+    display: flex;
+    gap: 15px;
+    margin-bottom: 12px;
+    padding: 8px 18px;
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+}
+
+.calendar-section {
+    flex: 1;
+    min-width: 0;
+}
+
+.calendar-header {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 12px;
+}
+
+.calendar-title {
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--text);
+    margin: 0;
+}
+
+.calendar-months {
+    display: flex;
+    gap: 4px;
+    padding-left: 24px;
+    margin-bottom: 4px;
+    overflow-x: auto;
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+}
+
+.calendar-months::-webkit-scrollbar {
+    display: none;
+}
+
+.month-label {
+    font-size: 10px;
+    color: var(--muted);
+    text-align: center;
+    width: 216px;
+    flex-shrink: 0;
+}
+
+.contribution-graph {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    overflow-x: auto;
+    padding-bottom: 8px;
+    scrollbar-width: thin;
+    scrollbar-color: rgba(0,217,255,0.2) rgba(255,255,255,0.02);
+}
+
+.contribution-graph::-webkit-scrollbar {
+    height: 6px;
+}
+
+.contribution-graph::-webkit-scrollbar-track {
+    background: rgba(255,255,255,0.02);
+    border-radius: 3px;
+}
+
+.contribution-graph::-webkit-scrollbar-thumb {
+    background: rgba(0,217,255,0.2);
+    border-radius: 3px;
+}
+
+.graph-row {
+    display: flex;
+    gap: 8px;
+}
+
+.graph-cell {
+    width: 24px;
+    height: 24px;
+    aspect-ratio: 1;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: all 0.15s;
+}
+
+.graph-cell:hover {
+    transform: scale(1.2);
+}
+
+.graph-cell.level-0 {
+    background: rgba(255,255,255,0.08);
+}
+
+.graph-cell.level-1 {
+    background: rgba(0,217,255,0.25);
+}
+
+.graph-cell.level-2 {
+    background: rgba(0,217,255,0.45);
+}
+
+.graph-cell.level-3 {
+    background: rgba(0,217,255,0.65);
+}
+
+.graph-cell.level-4 {
+    background: rgba(0,217,255,0.85);
+}
+
+.graph-cell.today {
+    outline: 1px solid var(--primary);
+    outline-offset: 1px;
+}
+
+.calendar-legend {
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    gap: 4px;
+    margin-top: 8px;
+}
+
+.legend-label {
+    font-size: 8px;
+    color: var(--muted);
+}
+
+.legend-block {
+    width: 9px;
+    height: 9px;
+    border-radius: 2px;
+}
+
+.legend-block.level-0 {
+    background: rgba(255,255,255,0.08);
+}
+
+.legend-block.level-1 {
+    background: rgba(0,217,255,0.25);
+}
+
+.legend-block.level-2 {
+    background: rgba(0,217,255,0.45);
+}
+
+.legend-block.level-3 {
+    background: rgba(0,217,255,0.65);
+}
+
+.legend-block.level-4 {
+    background: rgba(0,217,255,0.85);
+}
+
+.calendar-stats {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    padding: 14px 16px;
+    background: rgba(255,107,157,0.08);
+    border: 1px solid rgba(255,107,157,0.15);
+    border-radius: 12px;
+    margin-top: 8px;
+}
+
+.stat-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.stat-label {
+    font-size: 12px;
+    color: rgba(255,255,255,0.8);
+    font-weight: 500;
+}
+
+.stat-value {
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--text);
+    white-space: nowrap;
+}
+
+.stat-value.highlight {
+    background: linear-gradient(135deg, var(--secondary), #ff96c0);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+}
+
+.action-section {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    width: 150px;
+}
+
+.btn-primary, .btn-secondary {
+    padding: 8px 12px;
+    border-radius: 6px;
+    border: none;
+    cursor: pointer;
+    font-size: 11px;
+    font-weight: 500;
+    transition: all 0.2s;
+}
+
+.btn-primary {
+    background: linear-gradient(135deg, var(--primary), var(--secondary));
+    color: white;
+}
+
+.btn-primary:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 3px 10px rgba(0,217,255,0.3);
+}
+
+.btn-secondary {
+    background: rgba(255,255,255,0.05);
+    color: var(--muted);
+    border: 1px solid var(--border);
+}
+
+.btn-secondary:hover {
+    background: rgba(0,217,255,0.1);
+    border-color: rgba(0,217,255,0.2);
+    color: var(--text);
+}

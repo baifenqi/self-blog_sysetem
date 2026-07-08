@@ -13,4 +13,6 @@ public interface MusicService {
     Long insert(Music music);
     boolean update(Music music);
     boolean deleteById(Long id);
+    List<Music> selectByUrl(String url);
+    int selectCount();
 }
