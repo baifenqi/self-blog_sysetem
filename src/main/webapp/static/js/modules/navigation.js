@@ -3,7 +3,7 @@
  * 负责按钮跳转、用户操作等
  */
 
-const NavigationModule = {
+var NavigationModule = {
     init() {
         this.bindEvents();
     },

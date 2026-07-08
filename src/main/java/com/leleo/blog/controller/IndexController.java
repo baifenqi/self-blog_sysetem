@@ -22,6 +22,8 @@ import org.springframework.web.bind.annotation.*;
 import javax.servlet.http.HttpSession;
 import org.springframework.web.multipart.MultipartFile;
 import java.io.File;
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -131,10 +133,14 @@ public class IndexController {
 
         List<Article> articles = articleService.selectPage(null, category.getId(), null, 1, 12).getList();
         List<Category> categories = categoryService.selectAllWithCount();
+        List<Music> musicList = musicService.selectEnabledList();
 
         model.addAttribute("category", category);
         model.addAttribute("articles", articles);
         model.addAttribute("categories", categories);
+        model.addAttribute("musicList", musicList);
+        model.addAttribute("siteName", settingService.getValue("site_name"));
+        model.addAttribute("siteDescription", settingService.getValue("site_description"));
 
         return "front/index";
     }
@@ -151,10 +157,14 @@ public class IndexController {
 
         List<Article> articles = articleService.selectPage(null, null, id, 1, 12).getList();
         List<Tag> tags = tagService.selectAllWithCount();
+        List<Music> musicList = musicService.selectEnabledList();
 
         model.addAttribute("tag", tag);
         model.addAttribute("articles", articles);
         model.addAttribute("tags", tags);
+        model.addAttribute("musicList", musicList);
+        model.addAttribute("siteName", settingService.getValue("site_name"));
+        model.addAttribute("siteDescription", settingService.getValue("site_description"));
 
         return "front/index";
     }
@@ -237,16 +247,66 @@ public class IndexController {
     }
 
     /**
+     * 获取背景文件列表API
+     * 扫描内置背景目录和上传背景目录，返回所有可用的背景文件
+     */
+    @GetMapping("/api/setting/background/list")
+    @ResponseBody
+    public Result<List<Map<String, String>>> getBackgroundList() {
+        List<Map<String, String>> list = new ArrayList<>();
+
+        // 扫描内置背景目录
+        String builtinPath = System.getProperty("user.dir") + "/src/main/webapp/static/images/backgrounds/";
+        File builtinDir = new File(builtinPath);
+        if (builtinDir.exists() && builtinDir.isDirectory()) {
+            scanBackgroundDir(builtinDir, "/static/images/backgrounds/", "builtin", list);
+        }
+
+        // 扫描上传背景目录
+        String uploadPath = System.getProperty("user.dir") + "/upload/backgrounds/";
+        File uploadDir = new File(uploadPath);
+        if (uploadDir.exists() && uploadDir.isDirectory()) {
+            scanBackgroundDir(uploadDir, "/upload/backgrounds/", "upload", list);
+        }
+
+        return Result.success(list);
+    }
+
+    /**
+     * 扫描背景目录，收集图片和视频文件
+     */
+    private void scanBackgroundDir(File dir, String urlPrefix, String source, List<Map<String, String>> list) {
+        File[] files = dir.listFiles();
+        if (files == null) return;
+
+        for (File file : files) {
+            if (file.isFile()) {
+                String name = file.getName().toLowerCase();
+                String type = null;
+                if (name.endsWith(".jpg") || name.endsWith(".jpeg") || name.endsWith(".png")
+                        || name.endsWith(".gif") || name.endsWith(".webp") || name.endsWith(".bmp")) {
+                    type = "image";
+                } else if (name.endsWith(".mp4") || name.endsWith(".webm") || name.endsWith(".mov")) {
+                    type = "video";
+                }
+                if (type != null) {
+                    Map<String, String> item = new HashMap<>();
+                    item.put("name", file.getName());
+                    item.put("url", urlPrefix + file.getName());
+                    item.put("type", type);
+                    item.put("source", source);
+                    list.add(item);
+                }
+            }
+        }
+    }
+
+    /**
      * 保存网站背景设置API
      */
     @PostMapping("/api/setting/background")
     @ResponseBody
-    public Result<String> saveBackground(@RequestBody Map<String, String> data, HttpSession session) {
-        User user = (User) session.getAttribute("user");
-        if (user == null || !"admin".equals(user.getRole())) {
-            return Result.unauthorized();
-        }
-
+    public Result<String> saveBackground(@RequestBody Map<String, String> data) {
         String background = data.get("background");
         if (background == null) {
             background = "default";
@@ -257,21 +317,25 @@ public class IndexController {
     }
 
     /**
-     * 上传背景图片API
+     * 上传背景图片/视频API
      */
     @PostMapping("/api/setting/background/upload")
     @ResponseBody
-    public Result<String> uploadBackground(@RequestParam("file") MultipartFile file) {
+    public Result<String> uploadBackground(@RequestParam("file") MultipartFile file, HttpSession session) {
+        User user = (User) session.getAttribute("user");
+        if (user == null) {
+            return Result.unauthorized();
+        }
         try {
-            // 检查文件类型
+            // 检查文件类型（支持图片和视频）
             String contentType = file.getContentType();
-            if (contentType == null || !contentType.startsWith("image/")) {
-                return Result.error("请上传图片文件");
+            if (contentType == null || (!contentType.startsWith("image/") && !contentType.startsWith("video/"))) {
+                return Result.error("请上传图片或视频文件");
             }
 
             // 检查文件大小（最大 20MB）
             if (file.getSize() > 20 * 1024 * 1024) {
-                return Result.error("图片大小不能超过 20MB");
+                return Result.error("文件大小不能超过 20MB");
             }
 
             // 获取上传目录

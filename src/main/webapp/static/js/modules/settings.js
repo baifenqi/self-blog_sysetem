@@ -3,7 +3,7 @@
  * 负责设置面板的打开、关闭和Tab切换
  */
 
-const SettingsModule = {
+var SettingsModule = {
     elements: {},
 
     init() {

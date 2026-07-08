@@ -1,89 +1,161 @@
 /**
- * 音乐播放模块
- * 负责音乐播放控制和列表交互
+ * Music Player Module
  */
 
-const MusicModule = {
+var MusicModule = {
     audio: null,
     currentIndex: 0,
     musicList: [],
 
-    init() {
+    init: function() {
         this.audio = document.createElement('audio');
         this.audio.loop = false;
         this.audio.preload = 'metadata';
-        
+        document.body.appendChild(this.audio);
+
         this.loadMusicList();
         this.bindEvents();
         this.setupAudioEvents();
+        this.restorePlaybackState();
     },
 
-    loadMusicList() {
-        const items = document.querySelectorAll('.music-popup .music-item');
-        items.forEach((item, index) => {
-            this.musicList.push({
+    savePlaybackState: function() {
+        var state = {
+            currentIndex: this.currentIndex,
+            currentTime: this.audio.currentTime,
+            isPlaying: !this.audio.paused,
+            src: this.audio.src
+        };
+        localStorage.setItem('blogMusicState', JSON.stringify(state));
+    },
+
+    restorePlaybackState: function() {
+        var savedState = localStorage.getItem('blogMusicState');
+        if (savedState) {
+            try {
+                var state = JSON.parse(savedState);
+                if (state.src && state.src !== this.audio.src) {
+                    this.audio.src = state.src;
+                    this.currentIndex = state.currentIndex;
+
+                    var musicTitle = document.getElementById('musicTitle');
+                    var musicCover = document.getElementById('musicCover');
+                    if (this.musicList[this.currentIndex]) {
+                        var music = this.musicList[this.currentIndex];
+                        if (musicTitle) musicTitle.textContent = music.title;
+                        if (music.cover && musicCover) {
+                            musicCover.style.backgroundImage = 'url(' + music.cover + ')';
+                            musicCover.style.backgroundSize = 'cover';
+                            musicCover.style.backgroundPosition = 'center';
+                        }
+                    }
+
+                    var self = this;
+                    document.querySelectorAll('.music-popup .music-item').forEach(function(item, i) {
+                        item.classList.toggle('active', i === self.currentIndex);
+                    });
+                }
+
+                if (state.currentTime) {
+                    this.audio.currentTime = state.currentTime;
+                }
+
+                var self = this;
+                if (state.isPlaying) {
+                    this.audio.play().then(function() {
+                        self.updatePlayButton(true);
+                        var musicCover = document.getElementById('musicCover');
+                        if (musicCover) musicCover.classList.remove('paused');
+                    }).catch(function(err) {
+                        console.log('Autoplay blocked');
+                        self.updatePlayButton(false);
+                    });
+                } else {
+                    this.updatePlayButton(false);
+                    var musicCover = document.getElementById('musicCover');
+                    if (musicCover) musicCover.classList.add('paused');
+                }
+            } catch (e) {
+                console.error('Failed to restore playback state:', e);
+            }
+        }
+    },
+
+    loadMusicList: function() {
+        var items = document.querySelectorAll('.music-popup .music-item');
+        if (items.length === 0) {
+            return;
+        }
+        var self = this;
+        items.forEach(function(item, index) {
+            self.musicList.push({
                 url: item.dataset.url,
                 title: item.dataset.title,
                 cover: item.dataset.cover,
-                artist: item.querySelector('.music-item-artist')?.textContent || ''
+                artist: item.querySelector('.music-item-artist') ? item.querySelector('.music-item-artist').textContent : ''
             });
             item.dataset.index = index;
         });
     },
 
-    bindEvents() {
-        const playBtn = document.getElementById('playBtn');
-        const musicCover = document.getElementById('musicCover');
+    bindEvents: function() {
+        var playBtn = document.getElementById('playBtn');
+        var musicCover = document.getElementById('musicCover');
+        var self = this;
 
         if (playBtn && musicCover) {
-            playBtn.addEventListener('click', (e) => {
+            playBtn.addEventListener('click', function(e) {
                 e.stopPropagation();
-                this.togglePlay();
+                self.togglePlay();
             });
         }
 
-        document.querySelectorAll('.music-popup .music-item').forEach(item => {
-            item.addEventListener('click', (e) => {
+        document.querySelectorAll('.music-popup .music-item').forEach(function(item) {
+            item.addEventListener('click', function(e) {
                 e.stopPropagation();
-                this.selectMusic(parseInt(item.dataset.index));
+                self.selectMusic(parseInt(item.dataset.index));
             });
         });
     },
 
-    setupAudioEvents() {
-        const progressBar = document.getElementById('musicProgressBar');
-        const currentTime = document.getElementById('musicCurrentTime');
-        const duration = document.getElementById('musicDuration');
+    setupAudioEvents: function() {
+        var progressBar = document.getElementById('musicProgressBar');
+        var currentTime = document.getElementById('musicCurrentTime');
+        var duration = document.getElementById('musicDuration');
+        var self = this;
 
-        this.audio.addEventListener('loadedmetadata', () => {
+        this.audio.addEventListener('loadedmetadata', function() {
             if (duration) {
-                duration.textContent = this.formatTime(this.audio.duration);
+                duration.textContent = self.formatTime(self.audio.duration);
             }
         });
 
-        this.audio.addEventListener('timeupdate', () => {
-            if (progressBar && this.audio.duration) {
-                const percent = (this.audio.currentTime / this.audio.duration) * 100;
+        this.audio.addEventListener('timeupdate', function() {
+            if (progressBar && self.audio.duration) {
+                var percent = (self.audio.currentTime / self.audio.duration) * 100;
                 progressBar.style.width = percent + '%';
             }
             if (currentTime) {
-                currentTime.textContent = this.formatTime(this.audio.currentTime);
+                currentTime.textContent = self.formatTime(self.audio.currentTime);
+            }
+            if (!self.audio.paused) {
+                self.savePlaybackState();
             }
         });
 
-        this.audio.addEventListener('ended', () => {
-            this.next();
+        this.audio.addEventListener('ended', function() {
+            self.next();
         });
 
-        this.audio.addEventListener('error', (e) => {
+        this.audio.addEventListener('error', function(e) {
             console.error('Audio error:', e);
-            this.next();
+            self.next();
         });
     },
 
-    togglePlay() {
-        const playBtn = document.getElementById('playBtn');
-        const musicCover = document.getElementById('musicCover');
+    togglePlay: function() {
+        var playBtn = document.getElementById('playBtn');
+        var musicCover = document.getElementById('musicCover');
 
         if (!playBtn || !musicCover) return;
 
@@ -94,77 +166,83 @@ const MusicModule = {
                 }
                 return;
             }
-            this.audio.play().then(() => {
-                this.updatePlayButton(true);
+            var self = this;
+            this.audio.play().then(function() {
+                self.updatePlayButton(true);
                 musicCover.classList.remove('paused');
-            }).catch(err => {
+                self.savePlaybackState();
+            }).catch(function(err) {
                 console.error('Play failed:', err);
             });
         } else {
             this.audio.pause();
             this.updatePlayButton(false);
             musicCover.classList.add('paused');
+            this.savePlaybackState();
         }
     },
 
-    updatePlayButton(isPlaying) {
-        const playBtn = document.getElementById('playBtn');
+    updatePlayButton: function(isPlaying) {
+        var playBtn = document.getElementById('playBtn');
         if (!playBtn) return;
-        const iconPlay = playBtn.querySelector('.icon-play');
-        const iconPause = playBtn.querySelector('.icon-pause');
+        var iconPlay = playBtn.querySelector('.icon-play');
+        var iconPause = playBtn.querySelector('.icon-pause');
         if (iconPlay && iconPause) {
             iconPlay.style.display = isPlaying ? 'none' : 'block';
             iconPause.style.display = isPlaying ? 'block' : 'none';
         }
     },
 
-    selectMusic(index) {
+    selectMusic: function(index) {
         if (index < 0 || index >= this.musicList.length) return;
 
         this.currentIndex = index;
-        const music = this.musicList[index];
+        var music = this.musicList[index];
 
-        document.querySelectorAll('.music-popup .music-item').forEach((item, i) => {
+        document.querySelectorAll('.music-popup .music-item').forEach(function(item, i) {
             item.classList.toggle('active', i === index);
         });
 
-        const musicTitle = document.getElementById('musicTitle');
-        const musicCover = document.getElementById('musicCover');
+        var musicTitle = document.getElementById('musicTitle');
+        var musicCover = document.getElementById('musicCover');
 
         if (musicTitle) musicTitle.textContent = music.title;
         if (music.cover && musicCover) {
-            musicCover.style.backgroundImage = `url('${music.cover}')`;
+            musicCover.style.backgroundImage = 'url(' + music.cover + ')';
             musicCover.style.backgroundSize = 'cover';
             musicCover.style.backgroundPosition = 'center';
         }
 
         this.audio.src = music.url;
-        
+
         this.updatePlayButton(true);
         if (musicCover) {
             musicCover.classList.remove('paused');
         }
 
-        this.audio.play().catch(err => {
+        var self = this;
+        this.audio.play().then(function() {
+            self.savePlaybackState();
+        }).catch(function(err) {
             console.error('Play failed:', err);
         });
     },
 
-    prev() {
-        const newIndex = this.currentIndex > 0 ? this.currentIndex - 1 : this.musicList.length - 1;
+    prev: function() {
+        var newIndex = this.currentIndex > 0 ? this.currentIndex - 1 : this.musicList.length - 1;
         this.selectMusic(newIndex);
     },
 
-    next() {
-        const newIndex = this.currentIndex < this.musicList.length - 1 ? this.currentIndex + 1 : 0;
+    next: function() {
+        var newIndex = this.currentIndex < this.musicList.length - 1 ? this.currentIndex + 1 : 0;
         this.selectMusic(newIndex);
     },
 
-    formatTime(seconds) {
+    formatTime: function(seconds) {
         if (isNaN(seconds)) return '0:00';
-        const mins = Math.floor(seconds / 60);
-        const secs = Math.floor(seconds % 60);
-        return `${mins}:${secs.toString().padStart(2, '0')}`;
+        var mins = Math.floor(seconds / 60);
+        var secs = Math.floor(seconds % 60);
+        return mins + ':' + (secs.toString().padStart(2, '0'));
     }
 };
 
@@ -176,6 +254,6 @@ function nextMusic() {
     MusicModule.next();
 }
 
-document.addEventListener('DOMContentLoaded', () => {
+document.addEventListener('DOMContentLoaded', function() {
     MusicModule.init();
 });

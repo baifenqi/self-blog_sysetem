@@ -3,7 +3,7 @@
  * 负责生成GitHub风格的贡献热力图
  */
 
-const CalendarModule = {
+var CalendarModule = {
     MONTH_NAMES: ['1月', '2月', '3月', '4月', '5月', '6月', '7月', '8月', '9月', '10月', '11月', '12月'],
     LEVEL_TEXTS: {
         0: '无提交',

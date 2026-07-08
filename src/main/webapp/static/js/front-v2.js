@@ -9,7 +9,7 @@
     function initModules() {
         var modules = [
             window.ClockModule,
-            window.SettingsModule, 
+            window.SettingsModule,
             window.BackgroundModule,
             window.CalendarModule,
             window.MusicModule,
