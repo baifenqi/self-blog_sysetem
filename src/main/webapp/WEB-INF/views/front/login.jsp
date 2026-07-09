@@ -107,24 +107,25 @@
             <button type="submit" class="btn-login">登 录</button>
         </form>
         <div class="register-link">
-            还没有账号？ <a href="/register">立即注册</a>
+            还没有账号？ <a href="${pageContext.request.contextPath}/register">立即注册</a>
         </div>
         <div class="error-msg" id="errorMsg"></div>
     </div>
 
     <script>
+        var contextPath = '${pageContext.request.contextPath}';
         document.getElementById('loginForm').addEventListener('submit', function(e) {
             e.preventDefault();
             var formData = new FormData(this);
             
-            fetch('/login', {
+            fetch(contextPath + '/login', {
                 method: 'POST',
                 body: formData
             })
             .then(response => response.json())
             .then(data => {
                 if (data.code === 200) {
-                    window.location.href = '/';
+                    window.location.href = contextPath + '/';
                 } else {
                     document.getElementById('errorMsg').textContent = data.message;
                 }

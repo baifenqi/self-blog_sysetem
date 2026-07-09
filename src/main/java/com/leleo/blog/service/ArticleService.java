@@ -4,6 +4,7 @@ import com.leleo.blog.common.PageResult;
 import com.leleo.blog.entity.Article;
 
 import java.util.List;
+import java.util.Map;
 
 /**
  * 文章服务接口
@@ -13,7 +14,12 @@ public interface ArticleService {
     /**
      * 分页查询文章列表
      */
-    PageResult<Article> selectPage(String keyword, Long categoryId, Long tagId, Integer pageNum, Integer pageSize);
+    PageResult<Article> selectPage(String keyword, Long categoryId, Long tagId, String date, Integer status, Integer pageNum, Integer pageSize);
+
+    /**
+     * 分页查询指定用户的文章
+     */
+    PageResult<Article> selectPageByUser(Long userId, Integer status, Integer pageNum, Integer pageSize);
 
     /**
      * 根据ID查询文章
@@ -46,6 +52,11 @@ public interface ArticleService {
     boolean updateViewCount(Long id);
 
     /**
+     * 更新评论数
+     */
+    boolean updateCommentCount(Long id);
+
+    /**
      * 更新点赞数
      */
     boolean updateLikeCount(Long id);
@@ -74,4 +85,14 @@ public interface ArticleService {
      * 获取所有文章列表
      */
     List<Article> selectAll();
+
+    /**
+     * 按月份统计每日文章数量
+     */
+    List<Map<String, Object>> getArticleCountByMonth(Integer year, Integer month);
+
+    /**
+     * 按日期查询文章列表
+     */
+    List<Article> getArticlesByDate(String date);
 }

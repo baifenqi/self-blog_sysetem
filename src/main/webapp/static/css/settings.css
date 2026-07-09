@@ -1,4 +1,4 @@
-.modal-overlay {
+﻿.modal-overlay {
     display: none;
     position: fixed;
     top: 0;
@@ -54,7 +54,7 @@
     border: none;
     color: var(--muted);
     cursor: pointer;
-    font-size: 12px;
+    font-size: 13px;
     transition: all 0.2s;
 }
 
@@ -76,7 +76,7 @@
     background: none;
     color: var(--muted);
     cursor: pointer;
-    font-size: 12px;
+    font-size: 13px;
     border-bottom: 2px solid transparent;
     margin-bottom: -1px;
     transition: all 0.2s;
@@ -96,7 +96,7 @@
 }
 
 .setting-section h4 {
-    font-size: 12px;
+    font-size: 13px;
     color: var(--muted);
     margin-bottom: 12px;
 }
@@ -147,12 +147,12 @@
 }
 
 .music-item-title {
-    font-size: 12px;
+    font-size: 13px;
     color: var(--text);
 }
 
 .music-item-artist {
-    font-size: 10px;
+    font-size: 13px;
     color: var(--muted);
     margin-top: 2px;
 }

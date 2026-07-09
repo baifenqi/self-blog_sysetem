@@ -1,4 +1,4 @@
-.navbar {
+﻿.navbar {
     position: fixed;
     top: 0;
     left: 0;
@@ -78,4 +78,26 @@
 .navbar-avatar:hover {
     border-color: var(--primary);
     transform: scale(1.05);
+}
+
+.nav-action-btn {
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    background: rgba(30,30,50,0.6);
+    border: 1px solid rgba(255,255,255,0.15);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 18px;
+    color: var(--text);
+    cursor: pointer;
+    text-decoration: none;
+    transition: all 0.2s;
+}
+
+.nav-action-btn:hover {
+    background: rgba(30,30,50,0.9);
+    border-color: var(--primary);
+    color: var(--primary);
 }

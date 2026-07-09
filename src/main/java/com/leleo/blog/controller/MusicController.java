@@ -2,12 +2,14 @@ package com.leleo.blog.controller;
 
 import com.leleo.blog.common.Result;
 import com.leleo.blog.entity.Music;
+import com.leleo.blog.entity.User;
 import com.leleo.blog.service.MusicService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
+import javax.servlet.http.HttpSession;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
@@ -36,7 +38,11 @@ public class MusicController {
      */
     @GetMapping("/scan")
     @ResponseBody
-    public Result<List<Music>> scanMusicFolder() {
+    public Result<List<Music>> scanMusicFolder(HttpSession session) {
+        User user = (User) session.getAttribute("user");
+        if (user == null || user.getId() == null) {
+            return Result.unauthorized();
+        }
         String musicPath = System.getProperty("user.dir") + "/src/main/webapp/static/music/";
         File dir = new File(musicPath);
         
@@ -57,8 +63,10 @@ public class MusicController {
         if (files != null) {
             for (int i = 0; i < files.length; i++) {
                 File file = files[i];
-                String title = file.getName().substring(0, file.getName().lastIndexOf('.'));
-                String url = "/static/music/" + file.getName();
+                String fileName = file.getName();
+                int dotIndex = fileName.lastIndexOf('.');
+                String title = dotIndex > 0 ? fileName.substring(0, dotIndex) : fileName;
+                String url = "/static/music/" + fileName;
                 
                 // 检查是否已存在
                 List<Music> existing = musicService.selectByUrl(url);
@@ -85,7 +93,11 @@ public class MusicController {
      */
     @PostMapping("/upload")
     @ResponseBody
-    public Result<Music> uploadMusic(@RequestParam("file") MultipartFile file) {
+    public Result<Music> uploadMusic(@RequestParam("file") MultipartFile file, HttpSession session) {
+        User user = (User) session.getAttribute("user");
+        if (user == null || user.getId() == null) {
+            return Result.unauthorized();
+        }
         try {
             String contentType = file.getContentType();
             if (contentType == null || 
@@ -137,7 +149,11 @@ public class MusicController {
      */
     @DeleteMapping("/{id}")
     @ResponseBody
-    public Result<String> deleteMusic(@PathVariable Long id) {
+    public Result<String> deleteMusic(@PathVariable Long id, HttpSession session) {
+        User user = (User) session.getAttribute("user");
+        if (user == null || user.getId() == null) {
+            return Result.unauthorized();
+        }
         Music music = musicService.selectById(id);
         if (music != null) {
             // 删除文件

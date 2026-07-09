@@ -114,7 +114,7 @@ public class AdminController {
             @RequestParam(required = false) Long categoryId,
             @RequestParam(defaultValue = "1") Integer pageNum,
             @RequestParam(defaultValue = "10") Integer pageSize) {
-        return articleService.selectPage(keyword, categoryId, null, pageNum, pageSize);
+        return articleService.selectPage(keyword, categoryId, null, null, null, pageNum, pageSize);
     }
 
     /**

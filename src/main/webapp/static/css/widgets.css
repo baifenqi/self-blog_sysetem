@@ -1,14 +1,14 @@
-.avatar-container {
+﻿.avatar-container {
     margin-bottom: 10px;
 }
 
 .avatar-wrapper {
     display: inline-block;
-    width: 90px;
-    height: 90px;
+    width: 110px;
+    height: 110px;
     border-radius: 50%;
-    box-shadow: 0 2px 8px rgba(0,0,0,0.15);
-    border: 3px solid rgba(255,255,255,0.15);
+    box-shadow: 0 4px 16px rgba(0,0,0,0.3);
+    border: 3px solid rgba(255,255,255,0.2);
     cursor: pointer;
     transition: all 0.2s ease;
     overflow: hidden;
@@ -29,19 +29,22 @@
 
 .username {
     text-align: center;
-    font-size: 14px;
+    font-size: 16px;
     color: var(--text);
-    margin-top: 8px;
-    font-weight: 500;
+    margin-top: 10px;
+    font-weight: 600;
 }
 
 .signature {
     text-align: center;
-    font-size: 12px;
+    font-size: 14px;
     color: var(--muted);
     font-style: italic;
     line-height: 1.6;
-    padding: 0 10px;
+    padding: 14px 18px;
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 12px;
 }
 
 .pie-chart-container {
@@ -51,7 +54,7 @@
 }
 
 .pie-chart-title {
-    font-size: 12px;
+    font-size: 13px;
     color: var(--muted);
     margin-bottom: 8px;
 }
@@ -89,21 +92,25 @@
     top: 50%;
     left: 50%;
     transform: translate(-50%, -50%);
-    font-size: 10px;
+    font-size: 13px;
     color: var(--muted);
     z-index: 1;
 }
 
 .social-links {
     display: flex;
-    gap: 8px;
+    gap: 10px;
     flex-wrap: wrap;
     justify-content: center;
+    padding: 14px;
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 12px;
 }
 
 .social-link {
-    width: 34px;
-    height: 34px;
+    width: 40px;
+    height: 40px;
     border-radius: 50%;
     background: rgba(255,255,255,0.05);
     border: 1px solid rgba(255,255,255,0.1);
@@ -112,7 +119,7 @@
     justify-content: center;
     color: var(--muted);
     text-decoration: none;
-    font-size: 14px;
+    font-size: 16px;
     transition: all 0.2s;
 }
 
@@ -149,17 +156,22 @@
     position: relative;
     cursor: pointer;
     margin-top: 15px;
+    padding: 18px;
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 12px;
 }
 
 .music-cover {
-    width: 80px;
-    height: 80px;
+    width: 96px;
+    height: 96px;
     border-radius: 50%;
     background: linear-gradient(135deg, #00d9ff 0%, #ff6b9d 50%, #9b59b6 100%);
-    box-shadow: 0 0 15px rgba(0,217,255,0.18);
+    box-shadow: 0 0 20px rgba(0,217,255,0.25);
     animation: spin 6s linear infinite;
     position: relative;
-    border: 2px solid rgba(0,217,255,0.2);
+    border: 3px solid rgba(0,217,255,0.25);
+    margin: 0 auto;
 }
 
 .music-cover::after {
@@ -198,14 +210,15 @@
 
 .music-popup {
     position: absolute;
-    top: -15px;
-    left: 100px;
+    top: 50%;
+    left: calc(100% + 10px);
+    transform: translateY(-50%);
     background: rgba(10,10,26,0.95);
     backdrop-filter: blur(15px);
     border: 1px solid rgba(0,217,255,0.25);
     border-radius: 12px;
     padding: 15px;
-    min-width: 220px;
+    min-width: 240px;
     opacity: 0;
     visibility: hidden;
     transition: all 0.3s;
@@ -292,22 +305,23 @@
 }
 
 .music-time {
-    font-size: 10px;
+    font-size: 13px;
     color: var(--muted);
     display: flex;
     justify-content: space-between;
 }
 
-.clock-widget {
+/* 旧的时钟样式 - 已移至 calendar.css 中的 .clock-widget */
+.clock-widget-sidebar {
     background: rgba(0,217,255,0.08);
     border: 1px solid rgba(0,217,255,0.15);
     border-radius: 12px;
     padding: 14px 16px;
-    margin-top: 8px;
+    margin-top: 10px;
 }
 
-.clock-time {
-    font-size: 20px;
+.clock-widget-sidebar .clock-time {
+    font-size: 22px;
     font-weight: 600;
     letter-spacing: 2px;
     background: linear-gradient(135deg, var(--primary), var(--secondary));
@@ -319,8 +333,8 @@
     margin-bottom: 4px;
 }
 
-.clock-date {
-    font-size: 11px;
+.clock-widget-sidebar .clock-date {
+    font-size: 13px;
     background: linear-gradient(135deg, var(--primary), var(--secondary));
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
@@ -358,16 +372,17 @@
     background: var(--card);
     border: 1px solid var(--border);
     border-radius: 12px;
-    padding: 14px;
+    padding: 18px;
 }
 
 .widget-title {
-    font-size: 11px;
-    color: var(--muted);
-    margin-bottom: 10px;
+    font-size: 15px;
+    color: var(--text);
+    margin-bottom: 14px;
     display: flex;
     align-items: center;
-    gap: 5px;
+    gap: 8px;
+    font-weight: 600;
 }
 
 .widget-title::before {
@@ -383,7 +398,7 @@
 }
 
 .category-list li {
-    padding: 6px 0;
+    padding: 8px 0;
     border-bottom: 1px solid var(--border);
 }
 
@@ -396,7 +411,7 @@
     justify-content: space-between;
     color: var(--text);
     text-decoration: none;
-    font-size: 11px;
+    font-size: 14px;
     transition: color 0.2s;
 }
 
@@ -405,27 +420,29 @@
 }
 
 .category-list li span {
-    font-size: 10px;
+    font-size: 13px;
     color: var(--muted);
-    background: rgba(255,255,255,0.05);
-    padding: 2px 5px;
-    border-radius: 5px;
+    background: rgba(255,255,255,0.06);
+    padding: 3px 8px;
+    border-radius: 6px;
+    font-weight: 500;
 }
 
 .tags-cloud {
     display: flex;
     flex-wrap: wrap;
-    gap: 6px;
+    gap: 8px;
 }
 
 .tag {
-    padding: 4px 10px;
-    border-radius: 12px;
-    font-size: 10px;
+    padding: 6px 14px;
+    border-radius: 14px;
+    font-size: 13px;
     background: rgba(0,217,255,0.08);
     border: 1px solid rgba(0,217,255,0.15);
     cursor: pointer;
     transition: all 0.2s;
+    font-weight: 500;
 }
 
 .tag:hover {
@@ -435,20 +452,20 @@
 .stats-grid {
     display: grid;
     grid-template-columns: repeat(2, 1fr);
-    gap: 8px;
+    gap: 10px;
 }
 
 .stat-item {
     text-align: center;
-    padding: 8px;
-    background: rgba(15,15,30,0.5);
-    border-radius: 8px;
+    padding: 12px 8px;
+    background: rgba(15,15,30,0.6);
+    border-radius: 10px;
     border: 1px solid rgba(255,255,255,0.08);
 }
 
 .stat-value {
-    font-size: 18px;
-    font-weight: 500;
+    font-size: 20px;
+    font-weight: 600;
     background: linear-gradient(135deg, var(--primary), var(--secondary));
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
@@ -456,7 +473,7 @@
 }
 
 .stat-label {
-    font-size: 9px;
+    font-size: 13px;
     color: var(--muted);
-    margin-top: 2px;
+    margin-top: 4px;
 }

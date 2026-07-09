@@ -1,4 +1,4 @@
-<%@ page contentType="text/html;charset=UTF-8" language="java" %>
+﻿<%@ page contentType="text/html;charset=UTF-8" language="java" %>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>
 <!DOCTYPE html>
@@ -7,15 +7,16 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>${siteName != null ? siteName : 'LELEO'} - 个人博客</title>
-    <link rel="stylesheet" href="${pageContext.request.contextPath}/static/css/variables.css">
-    <link rel="stylesheet" href="${pageContext.request.contextPath}/static/css/base.css">
-    <link rel="stylesheet" href="${pageContext.request.contextPath}/static/css/navbar.css">
-    <link rel="stylesheet" href="${pageContext.request.contextPath}/static/css/layout.css">
-    <link rel="stylesheet" href="${pageContext.request.contextPath}/static/css/calendar.css">
-    <link rel="stylesheet" href="${pageContext.request.contextPath}/static/css/article.css">
-    <link rel="stylesheet" href="${pageContext.request.contextPath}/static/css/widgets.css">
-    <link rel="stylesheet" href="${pageContext.request.contextPath}/static/css/settings.css?v=2026070802">
-    <link rel="stylesheet" href="${pageContext.request.contextPath}/static/css/responsive.css">
+    <script>window._contextPath = '${pageContext.request.contextPath}';</script>
+    <link rel="stylesheet" href="${pageContext.request.contextPath}/static/css/variables.css?v=2026070903">
+    <link rel="stylesheet" href="${pageContext.request.contextPath}/static/css/base.css?v=2026070903">
+    <link rel="stylesheet" href="${pageContext.request.contextPath}/static/css/navbar.css?v=2026070903">
+    <link rel="stylesheet" href="${pageContext.request.contextPath}/static/css/layout.css?v=2026070903">
+    <link rel="stylesheet" href="${pageContext.request.contextPath}/static/css/calendar.css?v=2026070903">
+    <link rel="stylesheet" href="${pageContext.request.contextPath}/static/css/article.css?v=2026070903">
+    <link rel="stylesheet" href="${pageContext.request.contextPath}/static/css/widgets.css?v=2026070903">
+    <link rel="stylesheet" href="${pageContext.request.contextPath}/static/css/settings.css?v=2026070903">
+    <link rel="stylesheet" href="${pageContext.request.contextPath}/static/css/responsive.css?v=2026070903">
     <style>
         .bg-container video.bg-video {
             width: 100%;
@@ -69,7 +70,95 @@
             border-color: #ff576c;
             color: #ff576c;
         }
-    </style>
+
+        /* 筛选提示条 */
+        .filter-bar {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 12px 18px;
+            margin-bottom: 16px;
+            background: linear-gradient(135deg, rgba(0,217,255,0.08), rgba(255,107,157,0.06));
+            border: 1px solid rgba(0,217,255,0.2);
+            border-radius: 12px;
+            backdrop-filter: blur(8px);
+        }
+        .filter-info {
+            font-size: 13px;
+            color: var(--text);
+            font-weight: 500;
+        }
+        .filter-clear {
+            padding: 6px 14px;
+            background: rgba(255,107,157,0.1);
+            border: 1px solid rgba(255,107,157,0.3);
+            color: #ff6b9d;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 12px;
+            transition: all 0.2s;
+        }
+        .filter-clear:hover {
+            background: rgba(255,107,157,0.2);
+            border-color: #ff6b9d;
+        }
+
+        /* 音乐播放器修复 - 弹窗改为下方显示 */
+        .music-popup {
+            top: calc(100% + 10px) !important;
+            left: 50% !important;
+            transform: translateX(-50%) !important;
+            width: 260px !important;
+            min-width: unset !important;
+        }
+
+        /* 音乐列表样式 */
+        .music-popup .music-list {
+            margin-top: 12px;
+            max-height: 180px;
+            overflow-y: auto;
+            border-top: 1px solid rgba(255,255,255,0.08);
+            padding-top: 10px;
+        }
+        .music-popup .music-list::-webkit-scrollbar {
+            width: 4px;
+        }
+        .music-popup .music-list::-webkit-scrollbar-track {
+            background: transparent;
+        }
+        .music-popup .music-list::-webkit-scrollbar-thumb {
+            background: rgba(0,217,255,0.3);
+            border-radius: 2px;
+        }
+        .music-popup .music-item {
+            padding: 8px 10px;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.2s;
+            margin-bottom: 4px;
+            display: block !important;
+        }
+        .music-popup .music-item:hover {
+            background: rgba(0,217,255,0.1);
+        }
+        .music-popup .music-item.active {
+            background: rgba(0,217,255,0.15);
+            border: 1px solid rgba(0,217,255,0.25);
+        }
+        .music-popup .music-item-title {
+            font-size: 13px;
+            color: var(--text);
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            display: block !important;
+        }
+        .music-popup .music-item.active .music-item-title {
+            color: var(--primary);
+            font-weight: 500;
+        }
+
+        </style>
 </head>
 <body>
     <div class="bg-container" id="bgContainer">
@@ -82,9 +171,6 @@
         </div>
         <div class="navbar-user">
             <div class="settings-btn" id="settingsBtn">&#9881;</div>
-            <div class="navbar-avatar" title="点击进入个人信息页"
-                 onclick="location.href='${pageContext.request.contextPath}/user/profile'"
-                 style="background: url('${sessionScope.user != null && sessionScope.user.avatar != null ? sessionScope.user.avatar : 'https://picsum.photos/40/40'}') center/cover;"></div>
         </div>
     </nav>
 
@@ -92,20 +178,15 @@
         <!-- 左侧面板 -->
         <div class="left-panel">
             <div class="left-main">
-                <div class="avatar-container">
+                <div class="avatar-container" onclick="location.href='${pageContext.request.contextPath}/user/profile'" style="cursor: pointer;">
                     <div class="avatar-wrapper">
-                        <img src="${sessionScope.user != null && sessionScope.user.avatar != null ? sessionScope.user.avatar : 'https://picsum.photos/90/90'}" alt="Avatar" class="avatar-img">
+                        <img src="${sessionScope.user != null && sessionScope.user.avatar != null ? pageContext.request.contextPath.concat(sessionScope.user.avatar) : 'https://picsum.photos/90/90'}" alt="Avatar" class="avatar-img" id="indexAvatar">
                     </div>
-                    <div class="username">${sessionScope.user != null ? sessionScope.user.nickname : 'LELEO'}</div>
+                    <div class="username" id="indexNickname">${sessionScope.user != null ? sessionScope.user.nickname : 'LELEO'}</div>
                 </div>
 
-                <div class="signature">
+                <div class="signature" id="indexSignature">
                     "${sessionScope.user != null && sessionScope.user.signature != null ? sessionScope.user.signature : '顶峰的少年,给了你所有细节,你却说我不是迪迦'}"
-                </div>
-
-                <div class="pie-chart-container">
-                    <div class="pie-chart-title">Tags</div>
-                    <div class="pie-chart"></div>
                 </div>
 
                 <div class="social-links">
@@ -173,12 +254,15 @@
 
             <!-- 移入的右侧面板内容 -->
             <div class="left-widgets">
-                <div class="widget">
-                    <div class="widget-title">文章分类</div>
+                <div class="widget" style="cursor:pointer;">
+                    <div class="widget-title" onclick="clearFilter()" style="display:flex;justify-content:space-between;align-items:center;">
+                        <span>文章分类</span>
+                        <span style="font-size:11px;color:var(--primary);font-weight:normal;">显示全部</span>
+                    </div>
                     <ul class="category-list">
                         <c:forEach items="${categories}" var="category">
                             <li>
-                                <a href="/category/${category.slug}">
+                                <a href="javascript:void(0)" onclick="filterByCategory(${category.id}, '${category.name}')">
                                     ${category.name}
                                     <span>${category.articleCount}</span>
                                 </a>
@@ -191,7 +275,7 @@
                     <div class="widget-title">标签云</div>
                     <div class="tags-cloud">
                         <c:forEach items="${tags}" var="tag">
-                            <span class="tag" style="border-color: ${tag.color}; color: ${tag.color}">${tag.name}</span>
+                            <span class="tag" style="border-color: ${tag.color}; color: ${tag.color};cursor:pointer;" onclick="filterByTag(${tag.id}, '${tag.name}')">${tag.name}</span>
                         </c:forEach>
                     </div>
                 </div>
@@ -225,49 +309,79 @@
             <div class="dashboard-header">
                 <div class="calendar-section">
                     <div class="calendar-header">
-                        <h3 class="calendar-title" id="calendarTitle">2025</h3>
+                        <h3 class="calendar-title" id="calendarTitle">📅 2025年7月</h3>
+                        <div class="calendar-nav">
+                            <button class="calendar-nav-btn" id="prevMonth">&#8249;</button>
+                            <button class="calendar-nav-btn" id="nextMonth">&#8250;</button>
+                        </div>
                     </div>
-                    <div class="calendar-months" id="calendarMonths"></div>
-                    <div class="contribution-graph" id="contributionGraph"></div>
+                    <div class="calendar-weekdays" id="calendarWeekdays"></div>
+                    <div class="calendar-days" id="calendarDays"></div>
                     <div class="calendar-legend">
-                        <span class="legend-label">少</span>
-                        <span class="legend-block level-0"></span>
-                        <span class="legend-block level-1"></span>
-                        <span class="legend-block level-2"></span>
-                        <span class="legend-block level-3"></span>
-                        <span class="legend-block level-4"></span>
-                        <span class="legend-label">多</span>
+                        <div class="legend-item">
+                            <span class="legend-block level-0"></span>
+                            <span class="legend-label">无</span>
+                        </div>
+                        <div class="legend-item">
+                            <span class="legend-block level-1"></span>
+                            <span class="legend-label">1-2</span>
+                        </div>
+                        <div class="legend-item">
+                            <span class="legend-block level-2"></span>
+                            <span class="legend-label">3-5</span>
+                        </div>
+                        <div class="legend-item">
+                            <span class="legend-block level-3"></span>
+                            <span class="legend-label">6-10</span>
+                        </div>
+                        <div class="legend-item">
+                            <span class="legend-block level-4"></span>
+                            <span class="legend-label">10+</span>
+                        </div>
+                        <span class="legend-label">篇/日</span>
                     </div>
                 </div>
                 <div class="action-section">
-                    <button class="btn-primary write-btn" id="writeBtn" onclick="goToWrite()">✏️ 写博客</button>
-                    <button class="btn-secondary draft-btn" id="draftBtn" onclick="goToDrafts()">📝 草稿箱</button>
-                    <button class="btn-secondary stats-btn" id="statsBtn" onclick="goToStats()">📊 统计</button>
+                    <div class="action-buttons">
+                        <button class="btn-primary write-btn" id="writeBtn" onclick="goToWrite()">✏️ 写博客</button>
+                        <button class="btn-secondary draft-btn" id="draftBtn" onclick="goToDrafts()">📝 草稿箱</button>
+                        <button class="btn-secondary stats-btn" id="statsBtn" onclick="goToStats()">📊 数据统计</button>
+                    </div>
                     <div class="clock-widget">
                         <div id="clockTime" class="clock-time">00:00:00</div>
                         <div id="clockDate" class="clock-date"></div>
                     </div>
                     <div class="calendar-stats">
                         <div class="stat-row">
-                            <span class="stat-label">过去一年提交</span>
-                            <span class="stat-value highlight">${articleStats.totalArticles}</span>
+                            <span class="stat-label">本月发布</span>
+                            <span class="stat-value highlight">${articleStats.monthArticles}</span>
                         </div>
                         <div class="stat-row">
-                            <span class="stat-label">最近一月</span>
-                            <span class="stat-value">${articleStats.monthArticles}</span>
-                        </div>
-                        <div class="stat-row">
-                            <span class="stat-label">最近一周</span>
+                            <span class="stat-label">本周发布</span>
                             <span class="stat-value">${articleStats.weekArticles}</span>
+                        </div>
+                        <div class="stat-row">
+                            <span class="stat-label">总计文章</span>
+                            <span class="stat-value">${articleStats.totalArticles}</span>
                         </div>
                     </div>
                 </div>
             </div>
-            <div class="articles-grid">
+            <!-- 筛选提示条 -->
+            <div class="filter-bar" id="filterBar" style="display:none;">
+                <span class="filter-info" id="filterInfo"></span>
+                <button class="filter-clear" id="filterClear" onclick="clearFilter()">✕ 清除筛选</button>
+            </div>
+            <div class="articles-grid" id="articlesGrid">
                 <c:forEach items="${articles}" var="article" varStatus="status">
                     <div class="article-card ${status.index % 5 == 0 ? 'large' : (status.index % 3 == 0 ? 'medium' : '')}"
-                         onclick="location.href='/article/${article.slug}'">
-                        <div class="card-image" style="${article.coverImage != null ? 'background: url(' += article.coverImage += ') center/cover;' : ''}"></div>
+                         onclick="location.href='${pageContext.request.contextPath}/article/${article.slug}'">
+                        <div class="card-image" style="${article.coverImage != null ? 'background: url(' += article.coverImage += ') center/cover;' : ''}">
+                            <div class="card-time-tag">
+                                <span class="time-day"><fmt:formatDate value="${article.createTime}" pattern="dd"/></span>
+                                <span class="time-month"><fmt:formatDate value="${article.createTime}" pattern="MM月"/></span>
+                            </div>
+                        </div>
                         <div class="card-content">
                             <h3 class="card-title">${article.title}</h3>
                             <p class="card-desc">${article.summary}</p>
@@ -327,14 +441,199 @@
 
     <script>
         var contextPath = '${pageContext.request.contextPath}';
+        var isLoggedIn = ${sessionScope.user != null && sessionScope.user.id != null ? 'true' : 'false'};
+
+        // 未登录时从 localStorage 恢复用户资料
+        (function() {
+            if (!isLoggedIn) {
+                var savedNickname = localStorage.getItem('profile_nickname');
+                var savedSignature = localStorage.getItem('profile_signature');
+                var savedAvatar = localStorage.getItem('profile_avatar');
+                if (savedNickname) {
+                    document.getElementById('indexNickname').textContent = savedNickname;
+                }
+                if (savedSignature !== null) {
+                    document.getElementById('indexSignature').textContent = '"' + savedSignature + '"';
+                }
+                if (savedAvatar) {
+                    document.getElementById('indexAvatar').src = savedAvatar;
+                }
+            }
+        })();
     </script>
-    <script src="${pageContext.request.contextPath}/static/js/modules/clock.js?v=20250101"></script>
-    <script src="${pageContext.request.contextPath}/static/js/modules/settings.js?v=20250101"></script>
-    <script src="${pageContext.request.contextPath}/static/js/modules/background.js?v=2026070801"></script>
-    <script src="${pageContext.request.contextPath}/static/js/modules/calendar.js?v=20250101"></script>
-    <script src="${pageContext.request.contextPath}/static/js/modules/music.js?v=2026070801"></script>
-    <script src="${pageContext.request.contextPath}/static/js/modules/search.js?v=20250101"></script>
-    <script src="${pageContext.request.contextPath}/static/js/modules/navigation.js?v=20250101"></script>
-    <script src="${pageContext.request.contextPath}/static/js/front-v2.js"></script>
+    <script src="${pageContext.request.contextPath}/static/js/modules/clock.js?v=2026070903"></script>
+    <script src="${pageContext.request.contextPath}/static/js/modules/settings.js?v=2026070903"></script>
+    <script src="${pageContext.request.contextPath}/static/js/modules/background.js?v=2026070903"></script>
+    <script src="${pageContext.request.contextPath}/static/js/modules/calendar.js?v=2026070903"></script>
+    <script src="${pageContext.request.contextPath}/static/js/modules/music.js?v=2026070903"></script>
+    <script src="${pageContext.request.contextPath}/static/js/modules/search.js?v=2026070903"></script>
+    <script src="${pageContext.request.contextPath}/static/js/modules/navigation.js?v=2026070903"></script>
+    <script src="${pageContext.request.contextPath}/static/js/front-v2.js?v=2026070903"></script>
+    <script>
+    (function() {
+        // 筛选状态
+        var currentCategory = null;
+        var currentTag = null;
+        var currentDate = null;
+        var articlesGrid = document.getElementById('articlesGrid');
+        var filterBar = document.getElementById('filterBar');
+        var filterInfo = document.getElementById('filterInfo');
+
+        function loadArticles(categoryId, tagId, date) {
+            var url = contextPath + '/api/articles?pageNum=1&pageSize=50';
+            if (categoryId) url += '&categoryId=' + categoryId;
+            if (tagId) url += '&tagId=' + tagId;
+            if (date) url += '&date=' + date;
+            fetch(url)
+                .then(function(r) { return r.json(); })
+                .then(function(data) {
+                    if (data.code === 200 && data.data) {
+                        renderArticles(data.data.list || []);
+                        updateFilterBar();
+                    }
+                });
+        }
+
+        function updateFilterBar() {
+            var filters = [];
+            if (currentCategory) filters.push('分类筛选');
+            if (currentTag) filters.push('标签筛选');
+            if (currentDate) filters.push('📅 ' + currentDate);
+
+            if (filters.length > 0) {
+                filterInfo.textContent = '当前筛选：' + filters.join(' · ');
+                filterBar.style.display = 'flex';
+            } else {
+                filterBar.style.display = 'none';
+            }
+        }
+
+        function renderArticles(list) {
+            if (!list || list.length === 0) {
+                articlesGrid.innerHTML = '<div style="text-align:center;color:var(--muted);padding:40px 0;font-size:14px;">暂无文章</div>';
+                return;
+            }
+            var html = '';
+            for (var i = 0; i < list.length; i++) {
+                var a = list[i];
+                var sizeClass = (i % 5 === 0) ? 'large' : (i % 3 === 0 ? 'medium' : '');
+                var coverStyle = a.coverImage ? 'background:url(' + a.coverImage + ') center/cover;' : '';
+                var timeTag = getTimeTag(a.createTime);
+                html += '<div class="article-card ' + sizeClass + '" onclick="location.href=\'' + contextPath + '/article/' + (a.slug || a.id) + '\'">' +
+                    '<div class="card-image" style="' + coverStyle + '">' + timeTag + '</div>' +
+                    '<div class="card-content">' +
+                    '<h3 class="card-title">' + escapeHtml(a.title) + '</h3>' +
+                    '<p class="card-desc">' + escapeHtml(a.summary || '') + '</p>' +
+                    '<div class="card-footer">' +
+                    '<span class="card-category">' + escapeHtml(a.categoryName || '未分类') + '</span>' +
+                    '<span class="card-date">' + formatDate(a.createTime) + '</span>' +
+                    '</div></div></div>';
+            }
+            articlesGrid.innerHTML = html;
+        }
+
+        function escapeHtml(str) {
+            if (!str) return '';
+            return str.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+        }
+
+        function formatDate(time) {
+            if (!time) return '';
+            var d = new Date(time);
+            var y = d.getFullYear();
+            var m = String(d.getMonth() + 1).padStart(2, '0');
+            var day = String(d.getDate()).padStart(2, '0');
+            return y + '-' + m + '-' + day;
+        }
+
+        function getTimeTag(time) {
+            if (!time) return '';
+            var d = new Date(time);
+            var day = String(d.getDate()).padStart(2, '0');
+            var month = d.getMonth() + 1;
+            return '<div class="card-time-tag">' +
+                '<span class="time-day">' + day + '</span>' +
+                '<span class="time-month">' + month + '月</span>' +
+                '</div>';
+        }
+
+        window.filterByCategory = function(id, name) {
+            currentCategory = id;
+            currentTag = null;
+            currentDate = null;
+            loadArticles(id, null, null);
+        };
+
+        window.filterByTag = function(id, name) {
+            currentTag = id;
+            currentCategory = null;
+            currentDate = null;
+            loadArticles(null, id, null);
+        };
+
+        window.filterByDate = function(date) {
+            currentDate = date;
+            currentCategory = null;
+            currentTag = null;
+            loadArticles(null, null, date);
+        };
+
+        window.clearFilter = function() {
+            currentCategory = null;
+            currentTag = null;
+            currentDate = null;
+            loadArticles(null, null, null);
+        };
+
+        // 覆盖日历模块：修复数据格式 + 点击日期在文章展示区显示
+        (function overrideCalendar() {
+            function doOverride() {
+                if (window.CalendarModule && CalendarModule._initialized) {
+                    // 修复：API返回数组，需转为对象格式 { dateStr: count }
+                    var origLoad = CalendarModule.loadMonthData.bind(CalendarModule);
+                    CalendarModule.loadMonthData = function() {
+                        var self = this;
+                        return origLoad().then(function() {
+                            if (Array.isArray(self.articleCounts)) {
+                                var map = {};
+                                for (var i = 0; i < self.articleCounts.length; i++) {
+                                    var item = self.articleCounts[i];
+                                    var d = item.date || item.Date || item.day;
+                                    var c = item.count != null ? item.count : (item.Count != null ? item.Count : 0);
+                                    if (d) map[d] = parseInt(c, 10) || 0;
+                                }
+                                self.articleCounts = map;
+                                self.renderCalendar();
+                            }
+                        });
+                    };
+
+                    // 覆盖点击行为：在文章展示区显示
+                    CalendarModule.handleDayClick = function(dateStr) {
+                        filterByDate(dateStr);
+                        var articlesGrid = document.getElementById('articlesGrid');
+                        if (articlesGrid) {
+                            articlesGrid.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                        }
+                    };
+
+                    // 重新加载数据以应用修复
+                    CalendarModule.loadMonthData();
+                    return true;
+                }
+                return false;
+            }
+            if (!doOverride()) {
+                var count = 0;
+                var timer = setInterval(function() {
+                    count++;
+                    if (doOverride() || count > 30) {
+                        clearInterval(timer);
+                    }
+                }, 100);
+            }
+        })();
+    })();
+    </script>
 </body>
 </html>

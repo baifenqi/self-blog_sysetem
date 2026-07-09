@@ -51,6 +51,16 @@ public class Constants {
     public static final Integer STATUS_DISABLED = 0;
 
     /**
+     * 文章状态：草稿
+     */
+    public static final Integer ARTICLE_STATUS_DRAFT = 0;
+
+    /**
+     * 文章状态：已发布
+     */
+    public static final Integer ARTICLE_STATUS_PUBLISHED = 1;
+
+    /**
      * 是
      */
     public static final Integer YES = 1;

@@ -1,5 +1,8 @@
 package com.leleo.blog.service.impl;
 
+import com.github.pagehelper.PageHelper;
+import com.github.pagehelper.PageInfo;
+import com.leleo.blog.common.PageResult;
 import com.leleo.blog.mapper.CategoryMapper;
 import com.leleo.blog.service.CategoryService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -38,6 +41,9 @@ public class CategoryServiceImpl implements CategoryService {
 
     @Override
     public List<Category> selectPage(String name, Integer pageNum, Integer pageSize) {
+        if (pageNum != null && pageSize != null && pageSize > 0) {
+            PageHelper.startPage(pageNum, pageSize);
+        }
         return categoryMapper.selectPage(name);
     }
 

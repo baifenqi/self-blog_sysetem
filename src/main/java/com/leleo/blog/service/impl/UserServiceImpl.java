@@ -6,7 +6,9 @@ import com.leleo.blog.mapper.UserMapper;
 import com.leleo.blog.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.util.DigestUtils;
 
+import java.nio.charset.StandardCharsets;
 import java.util.List;
 
 /**
@@ -28,21 +30,30 @@ public class UserServiceImpl implements UserService {
         return userMapper.selectByUsername(username);
     }
 
+    private String md5(String str) {
+        return DigestUtils.md5DigestAsHex(str.getBytes(StandardCharsets.UTF_8));
+    }
+
     @Override
     public User login(String username, String password) {
-        return userMapper.login(username, password);
+        return userMapper.login(username, md5(password));
     }
 
     @Override
     public Long insert(User user) {
         if (user.getStatus() == null) user.setStatus(Constants.STATUS_ENABLED);
         if (user.getRole() == null) user.setRole(Constants.ROLE_USER);
+        user.setPassword(md5(user.getPassword()));
         userMapper.insert(user);
         return user.getId();
     }
 
     @Override
     public boolean update(User user) {
+        // 如果更新密码，则进行MD5加密
+        if (user.getPassword() != null && !user.getPassword().isEmpty()) {
+            user.setPassword(md5(user.getPassword()));
+        }
         return userMapper.update(user) > 0;
     }
 
@@ -54,10 +65,16 @@ public class UserServiceImpl implements UserService {
     @Override
     public boolean updatePassword(Long id, String oldPassword, String newPassword) {
         User user = userMapper.selectById(id);
-        if (user != null && user.getPassword().equals(oldPassword)) {
-            return userMapper.updatePassword(id, newPassword) > 0;
+        if (user != null && user.getPassword().equals(md5(oldPassword))) {
+            return userMapper.updatePassword(id, md5(newPassword)) > 0;
         }
         return false;
+    }
+
+    @Override
+    public boolean verifyPassword(Long id, String password) {
+        User user = userMapper.selectById(id);
+        return user != null && user.getPassword().equals(md5(password));
     }
 
     @Override

@@ -47,7 +47,10 @@ public class CommentServiceImpl implements CommentService {
     @Override
     public Long insert(Comment comment) {
         if (comment.getIsDeleted() == null) comment.setIsDeleted(0);
-        if (comment.getParentId() == null) comment.setParentId(0L);
+        // 顶级评论 parentId 设为 null（与查询条件保持一致）
+        if (comment.getParentId() != null && comment.getParentId() == 0L) {
+            comment.setParentId(null);
+        }
         commentMapper.insert(comment);
         return comment.getId();
     }

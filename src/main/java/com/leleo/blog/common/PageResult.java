@@ -42,7 +42,12 @@ public class PageResult<T> implements Serializable {
         this.total = total;
         this.pageNum = pageNum;
         this.pageSize = pageSize;
-        this.totalPages = (int) Math.ceil((double) total / pageSize);
+        // 防止除零异常
+        if (pageSize == null || pageSize <= 0) {
+            this.totalPages = total > 0 ? 1 : 0;
+        } else {
+            this.totalPages = (int) Math.ceil((double) total / pageSize);
+        }
         this.list = list;
     }
 

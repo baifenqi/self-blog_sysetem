@@ -13,7 +13,11 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDate;
+import java.time.YearMonth;
+import java.time.format.DateTimeFormatter;
 import java.util.List;
+import java.util.Map;
 
 /**
  * 文章服务实现类
@@ -28,12 +32,30 @@ public class ArticleServiceImpl implements ArticleService {
     private TagMapper tagMapper;
 
     @Override
-    public PageResult<Article> selectPage(String keyword, Long categoryId, Long tagId, Integer pageNum, Integer pageSize) {
+    public PageResult<Article> selectPage(String keyword, Long categoryId, Long tagId, String date, Integer status, Integer pageNum, Integer pageSize) {
         if (pageNum == null) pageNum = 1;
         if (pageSize == null) pageSize = Constants.DEFAULT_PAGE_SIZE;
 
         PageHelper.startPage(pageNum, pageSize);
-        List<Article> list = articleMapper.selectPage(keyword, categoryId, tagId);
+        List<Article> list = articleMapper.selectPage(keyword, categoryId, tagId, date, status, null);
+        PageInfo<Article> pageInfo = new PageInfo<>(list);
+
+        // 查询每个文章的标签
+        for (Article article : list) {
+            List<Tag> tags = tagMapper.selectByArticleId(article.getId());
+            article.setTags(tags);
+        }
+
+        return PageResult.build(pageInfo.getTotal(), pageNum, pageSize, list);
+    }
+
+    @Override
+    public PageResult<Article> selectPageByUser(Long userId, Integer status, Integer pageNum, Integer pageSize) {
+        if (pageNum == null) pageNum = 1;
+        if (pageSize == null) pageSize = Constants.DEFAULT_PAGE_SIZE;
+
+        PageHelper.startPage(pageNum, pageSize);
+        List<Article> list = articleMapper.selectPage(null, null, null, null, status, userId);
         PageInfo<Article> pageInfo = new PageInfo<>(list);
 
         // 查询每个文章的标签
@@ -73,6 +95,7 @@ public class ArticleServiceImpl implements ArticleService {
         if (article.getLikeCount() == null) article.setLikeCount(0);
         if (article.getIsTop() == null) article.setIsTop(0);
         if (article.getIsDeleted() == null) article.setIsDeleted(0);
+        if (article.getStatus() == null) article.setStatus(Constants.ARTICLE_STATUS_PUBLISHED);
 
         articleMapper.insert(article);
 
@@ -113,6 +136,11 @@ public class ArticleServiceImpl implements ArticleService {
     }
 
     @Override
+    public boolean updateCommentCount(Long id) {
+        return articleMapper.updateCommentCount(id) > 0;
+    }
+
+    @Override
     public boolean updateLikeCount(Long id) {
         return articleMapper.updateLikeCount(id) > 0;
     }
@@ -140,5 +168,28 @@ public class ArticleServiceImpl implements ArticleService {
     @Override
     public List<Article> selectAll() {
         return articleMapper.selectAll();
+    }
+
+    @Override
+    public List<Map<String, Object>> getArticleCountByMonth(Integer year, Integer month) {
+        YearMonth yearMonth = YearMonth.of(year, month);
+        LocalDate firstDay = yearMonth.atDay(1);
+        LocalDate lastDay = yearMonth.atEndOfMonth();
+
+        String startDate = firstDay.format(DateTimeFormatter.ofPattern("yyyy-MM-dd")) + " 00:00:00";
+        String endDate = lastDay.format(DateTimeFormatter.ofPattern("yyyy-MM-dd")) + " 23:59:59";
+
+        return articleMapper.selectArticleCountByMonth(startDate, endDate);
+    }
+
+    @Override
+    public List<Article> getArticlesByDate(String date) {
+        List<Article> articles = articleMapper.selectByDate(date);
+        // 查询每篇文章的标签
+        for (Article article : articles) {
+            List<Tag> tags = tagMapper.selectByArticleId(article.getId());
+            article.setTags(tags);
+        }
+        return articles;
     }
 }

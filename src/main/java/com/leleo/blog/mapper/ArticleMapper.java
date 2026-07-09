@@ -4,6 +4,7 @@ import com.leleo.blog.entity.Article;
 import org.apache.ibatis.annotations.Param;
 
 import java.util.List;
+import java.util.Map;
 
 /**
  * 文章Mapper接口
@@ -15,7 +16,10 @@ public interface ArticleMapper extends BaseMapper<Article> {
      */
     List<Article> selectPage(@Param("keyword") String keyword,
                             @Param("categoryId") Long categoryId,
-                            @Param("tagId") Long tagId);
+                            @Param("tagId") Long tagId,
+                            @Param("date") String date,
+                            @Param("status") Integer status,
+                            @Param("userId") Long userId);
 
     /**
      * 根据slug查询文章
@@ -56,4 +60,14 @@ public interface ArticleMapper extends BaseMapper<Article> {
      * 获取文章统计信息
      */
     java.util.Map<String, Object> selectStatistics();
+
+    /**
+     * 按月份统计每日文章数量
+     */
+    List<Map<String, Object>> selectArticleCountByMonth(@Param("startDate") String startDate, @Param("endDate") String endDate);
+
+    /**
+     * 按日期查询文章列表
+     */
+    List<Article> selectByDate(@Param("date") String date);
 }

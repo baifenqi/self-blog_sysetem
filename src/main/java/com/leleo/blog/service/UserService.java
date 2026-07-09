@@ -23,5 +23,7 @@ public interface UserService {
 
     boolean updatePassword(Long id, String oldPassword, String newPassword);
 
+    boolean verifyPassword(Long id, String password);
+
     List<User> selectByRole(String role);
 }

@@ -9,40 +9,45 @@ var NavigationModule = {
     },
 
     bindEvents() {
-        // 写博客按钮
         document.querySelectorAll('[data-action="write"]').forEach(btn => {
             btn.addEventListener('click', () => this.goToWrite());
         });
 
-        // 草稿箱按钮
         document.querySelectorAll('[data-action="drafts"]').forEach(btn => {
             btn.addEventListener('click', () => this.goToDrafts());
         });
 
-        // 统计按钮
         document.querySelectorAll('[data-action="stats"]').forEach(btn => {
             btn.addEventListener('click', () => this.goToStats());
         });
     },
 
     goToWrite() {
-        window.location.href = '/article/write';
+        window.location.href = contextPath + '/write';
     },
 
     goToDrafts() {
-        window.location.href = '/article/drafts';
+        window.location.href = contextPath + '/drafts';
     },
 
     goToStats() {
-        window.location.href = '/stats';
+        window.location.href = contextPath + '/stats';
+    },
+
+    goToProfile() {
+        window.location.href = contextPath + '/user/profile';
+    },
+
+    goToSecurity() {
+        window.location.href = contextPath + '/user/security';
     },
 
     goToLogin() {
-        window.location.href = '/login';
+        window.location.href = contextPath + '/login';
     },
 
     goToRegister() {
-        window.location.href = '/register';
+        window.location.href = contextPath + '/register';
     }
 };
 
@@ -50,7 +55,6 @@ document.addEventListener('DOMContentLoaded', () => {
     NavigationModule.init();
 });
 
-// 保留全局函数供内联调用
 function goToWrite() { NavigationModule.goToWrite(); }
 function goToDrafts() { NavigationModule.goToDrafts(); }
 function goToStats() { NavigationModule.goToStats(); }

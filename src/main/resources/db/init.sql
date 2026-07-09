@@ -61,6 +61,7 @@ CREATE TABLE `blog_article` (
   `like_count` INT(11) DEFAULT 0 COMMENT '点赞数',
   `is_top` TINYINT(1) DEFAULT 0 COMMENT '是否置顶：0-否，1-是',
   `is_deleted` TINYINT(1) DEFAULT 0 COMMENT '是否删除：0-否，1-是',
+  `status` TINYINT(1) DEFAULT 1 COMMENT '状态：0-草稿，1-已发布',
   `create_time` DATETIME DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
   `update_time` DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
   PRIMARY KEY (`id`),

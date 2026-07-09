@@ -1,6 +1,8 @@
 package com.leleo.blog.controller;
 
+import com.leleo.blog.common.Constants;
 import com.leleo.blog.common.Result;
+import com.leleo.blog.common.PageResult;
 import com.leleo.blog.entity.*;
 import com.leleo.blog.service.*;
 import com.leleo.blog.mapper.UserMapper;
@@ -107,9 +109,14 @@ public class IndexController {
         // 获取分类
         Category category = categoryService.selectById(article.getCategoryId());
 
+        // 获取音乐列表
+        List<Music> musicList = musicService.selectEnabledList();
+        model.addAttribute("musicList", musicList);
+
         model.addAttribute("article", article);
         model.addAttribute("comments", comments);
         model.addAttribute("category", category);
+        model.addAttribute("siteName", settingService.getValue("site_name"));
 
         return "front/article";
     }
@@ -124,7 +131,7 @@ public class IndexController {
             return "redirect:/";
         }
 
-        List<Article> articles = articleService.selectPage(null, category.getId(), null, 1, 12).getList();
+        List<Article> articles = articleService.selectPage(null, category.getId(), null, null, Constants.ARTICLE_STATUS_PUBLISHED, 1, 12).getList();
         List<Category> categories = categoryService.selectAllWithCount();
         List<Music> musicList = musicService.selectEnabledList();
 
@@ -148,7 +155,7 @@ public class IndexController {
             return "redirect:/";
         }
 
-        List<Article> articles = articleService.selectPage(null, null, id, 1, 12).getList();
+        List<Article> articles = articleService.selectPage(null, null, id, null, Constants.ARTICLE_STATUS_PUBLISHED, 1, 12).getList();
         List<Tag> tags = tagService.selectAllWithCount();
         List<Music> musicList = musicService.selectEnabledList();
 
@@ -160,6 +167,22 @@ public class IndexController {
         model.addAttribute("siteDescription", settingService.getValue("site_description"));
 
         return "front/index";
+    }
+
+    /**
+     * AJAX获取文章列表（支持分类和标签筛选）
+     */
+    @GetMapping("/api/articles")
+    @ResponseBody
+    public Result<PageResult<Article>> apiArticles(
+            @RequestParam(required = false) String keyword,
+            @RequestParam(required = false) Long categoryId,
+            @RequestParam(required = false) Long tagId,
+            @RequestParam(required = false) String date,
+            @RequestParam(defaultValue = "1") Integer pageNum,
+            @RequestParam(defaultValue = "12") Integer pageSize) {
+        PageResult<Article> result = articleService.selectPage(keyword, categoryId, tagId, date, Constants.ARTICLE_STATUS_PUBLISHED, pageNum, pageSize);
+        return Result.success(result);
     }
 
     /**
@@ -375,8 +398,7 @@ public class IndexController {
         Long id = commentService.insert(comment);
 
         // 更新文章评论数
-        articleService.selectById(comment.getArticleId());
-        articleService.selectById(comment.getArticleId());
+        articleService.updateCommentCount(comment.getArticleId());
 
         return Result.success(id);
     }
@@ -385,15 +407,84 @@ public class IndexController {
      * 用户资料页面
      */
     @GetMapping("/user/profile")
-    public String profile(HttpSession session) {
+    public String profile(Model model) {
+        // 获取音乐列表
+        List<Music> musicList = musicService.selectEnabledList();
+        model.addAttribute("musicList", musicList);
+        model.addAttribute("siteName", settingService.getValue("site_name"));
         return "front/profile";
+    }
+
+    /**
+     * 写文章页面
+     */
+    @GetMapping("/write")
+    public String writePage(@RequestParam(required = false) Long edit, Model model, HttpSession session) {
+        model.addAttribute("categories", categoryService.selectAll());
+        model.addAttribute("tags", tagService.selectAll());
+
+        // 如果是编辑模式，加载文章数据
+        if (edit != null) {
+            User user = (User) session.getAttribute("user");
+            if (user != null && user.getId() != null) {
+                Article article = articleService.selectById(edit);
+                if (article != null && article.getUserId().equals(user.getId())) {
+                    model.addAttribute("article", article);
+                }
+            }
+        }
+
+        // 获取音乐列表
+        List<Music> musicList = musicService.selectEnabledList();
+        model.addAttribute("musicList", musicList);
+        model.addAttribute("siteName", settingService.getValue("site_name"));
+        return "front/write";
+    }
+
+    /**
+     * 保存文章API（前台写文章）
+     */
+    @PostMapping("/article/write/save")
+    @ResponseBody
+    public Result<Long> saveArticle(@RequestBody Article article,
+                                    @RequestParam(required = false) Integer status,
+                                    HttpSession session) {
+        User user = (User) session.getAttribute("user");
+        if (user == null) {
+            return Result.unauthorized();
+        }
+
+        article.setUserId(user.getId());
+
+        // 设置状态，默认为已发布
+        if (status == null) {
+            status = Constants.ARTICLE_STATUS_PUBLISHED;
+        }
+        article.setStatus(status);
+
+        if (article.getId() == null) {
+            Long id = articleService.insert(article, article.getTagIds());
+            return Result.success(id);
+        } else {
+            // 验证是否是自己的文章
+            Article existArticle = articleService.selectById(article.getId());
+            if (existArticle == null || !existArticle.getUserId().equals(user.getId())) {
+                return Result.error("无权编辑该文章");
+            }
+            articleService.update(article, article.getTagIds());
+            return Result.success(article.getId());
+        }
     }
 
     /**
      * 账号安全页面
      */
     @GetMapping("/user/security")
-    public String security(HttpSession session) {
+    public String security(Model model) {
+        // 获取音乐列表
+        List<Music> musicList = musicService.selectEnabledList();
+        model.addAttribute("musicList", musicList);
+        model.addAttribute("siteName", settingService.getValue("site_name"));
         return "front/security";
     }
 
@@ -450,8 +541,8 @@ public class IndexController {
     @ResponseBody
     public Result<String> uploadAvatar(@RequestParam("file") MultipartFile file, HttpSession session) {
         User user = (User) session.getAttribute("user");
-        if (user == null) {
-            user = new User();
+        if (user == null || user.getId() == null) {
+            return Result.unauthorized();
         }
 
         try {
@@ -474,16 +565,14 @@ public class IndexController {
             String extension = originalFilename != null && originalFilename.contains(".")
                     ? originalFilename.substring(originalFilename.lastIndexOf("."))
                     : ".png";
-            String filename = "avatar_" + (user.getId() != null ? user.getId() : "guest") + "_" + System.currentTimeMillis() + extension;
+            String filename = "avatar_" + user.getId() + "_" + System.currentTimeMillis() + extension;
 
             File destFile = new File(uploadPath + filename);
             file.transferTo(destFile);
 
             String avatarUrl = "/upload/avatars/" + filename;
             user.setAvatar(avatarUrl);
-            if (user.getId() != null) {
-                userService.update(user);
-            }
+            userService.update(user);
             session.setAttribute("user", user);
 
             return Result.success(avatarUrl);
@@ -504,8 +593,12 @@ public class IndexController {
             return Result.error("请先登录");
         }
 
+        String oldPassword = data.get("oldPassword");
         String newPassword = data.get("newPassword");
 
+        if (oldPassword == null || oldPassword.trim().isEmpty()) {
+            return Result.error("请输入旧密码");
+        }
         if (newPassword == null || newPassword.trim().isEmpty()) {
             return Result.error("请输入新密码");
         }
@@ -513,18 +606,15 @@ public class IndexController {
             return Result.error("新密码长度不能少于6位");
         }
 
-        User dbUser = userService.selectById(user.getId());
-        if (dbUser == null) {
-            return Result.error("用户不存在");
+        boolean success = userService.updatePassword(user.getId(), oldPassword, newPassword);
+        if (!success) {
+            return Result.error("旧密码错误");
         }
 
-        if (dbUser.getPassword().equals(newPassword)) {
-            return Result.error("新密码不能与旧密码相同");
-        }
-
-        user.setPassword(newPassword);
-        userService.update(user);
-        session.setAttribute("user", user);
+        // 更新session中的用户信息（清除密码）
+        User updatedUser = userService.selectById(user.getId());
+        updatedUser.setPassword(null);
+        session.setAttribute("user", updatedUser);
 
         return Result.success("密码修改成功");
     }
@@ -541,6 +631,7 @@ public class IndexController {
         }
 
         String newUsername = data.get("newUsername");
+        String currentPassword = data.get("currentPassword");
 
         if (newUsername == null || newUsername.trim().isEmpty()) {
             return Result.error("请输入新账号");
@@ -548,10 +639,18 @@ public class IndexController {
         if (newUsername.length() < 3) {
             return Result.error("新账号长度不能少于3位");
         }
+        if (currentPassword == null || currentPassword.trim().isEmpty()) {
+            return Result.error("请输入当前密码");
+        }
 
         User dbUser = userService.selectById(user.getId());
         if (dbUser == null) {
             return Result.error("用户不存在");
+        }
+
+        // 验证当前密码
+        if (!userService.verifyPassword(user.getId(), currentPassword)) {
+            return Result.error("当前密码错误");
         }
 
         User existingUser = userMapper.selectByUsername(newUsername);
@@ -561,8 +660,125 @@ public class IndexController {
 
         user.setUsername(newUsername);
         userService.update(user);
-        session.setAttribute("user", user);
+        // 更新session（清除密码）
+        User updatedUser = userService.selectById(user.getId());
+        updatedUser.setPassword(null);
+        session.setAttribute("user", updatedUser);
 
         return Result.success("账号修改成功");
+    }
+
+    /**
+     * 草稿箱页面
+     */
+    @GetMapping("/drafts")
+    public String draftsPage(Model model, HttpSession session) {
+        User user = (User) session.getAttribute("user");
+        if (user != null && user.getId() != null) {
+            List<Article> drafts = articleService.selectPageByUser(
+                    user.getId(),
+                    Constants.ARTICLE_STATUS_DRAFT,
+                    1,
+                    100
+            ).getList();
+            model.addAttribute("drafts", drafts);
+        }
+        // 获取音乐列表
+        List<Music> musicList = musicService.selectEnabledList();
+        model.addAttribute("musicList", musicList);
+        model.addAttribute("siteName", settingService.getValue("site_name"));
+        return "front/drafts";
+    }
+
+    /**
+     * 删除草稿API
+     */
+    @PostMapping("/article/draft/delete")
+    @ResponseBody
+    public Result<Boolean> deleteDraft(@RequestParam Long id, HttpSession session) {
+        User user = (User) session.getAttribute("user");
+        if (user == null || user.getId() == null) {
+            return Result.unauthorized();
+        }
+
+        Article article = articleService.selectById(id);
+        if (article == null || !article.getUserId().equals(user.getId())) {
+            return Result.error("无权删除该文章");
+        }
+
+        return Result.success(articleService.deleteById(id));
+    }
+
+    /**
+     * 统计页面
+     */
+    @GetMapping("/stats")
+    public String statsPage(Model model) {
+        List<Article> allArticles = articleService.selectAll();
+        List<Category> allCategories = categoryService.selectAllWithCount();
+        List<Tag> allTags = tagService.selectAllWithCount();
+        List<Comment> recentComments = commentService.selectRecentComments(1000);
+
+        model.addAttribute("articleCount", allArticles.size());
+        model.addAttribute("categoryCount", allCategories.size());
+        model.addAttribute("tagCount", allTags.size());
+        model.addAttribute("commentCount", recentComments.size());
+
+        // 总浏览量
+        int totalViews = 0;
+        int totalLikes = 0;
+        for (Article a : allArticles) {
+            totalViews += (a.getViewCount() != null ? a.getViewCount() : 0);
+            totalLikes += (a.getLikeCount() != null ? a.getLikeCount() : 0);
+        }
+        model.addAttribute("totalViews", totalViews);
+        model.addAttribute("totalLikes", totalLikes);
+
+        // 分类统计（带文章数）
+        model.addAttribute("categoryStats", allCategories);
+
+        // 标签统计（带文章数）
+        model.addAttribute("tagStats", allTags);
+
+        // 热门文章 TOP5（按浏览量排序）
+        List<Article> topArticles = new ArrayList<>(allArticles);
+        topArticles.sort((a, b) -> {
+            int va = a.getViewCount() != null ? a.getViewCount() : 0;
+            int vb = b.getViewCount() != null ? b.getViewCount() : 0;
+            return Integer.compare(vb, va);
+        });
+        model.addAttribute("topArticles", topArticles.size() > 5 ? topArticles.subList(0, 5) : topArticles);
+
+        // 最近评论
+        model.addAttribute("recentComments", recentComments.size() > 10 ? recentComments.subList(0, 10) : recentComments);
+
+        // 获取音乐列表
+        List<Music> musicList = musicService.selectEnabledList();
+        model.addAttribute("musicList", musicList);
+        model.addAttribute("siteName", settingService.getValue("site_name"));
+        return "front/stats";
+    }
+
+    /**
+     * 按月份统计每日文章数量
+     */
+    @GetMapping("/api/calendar/count")
+    @ResponseBody
+    public Result<List<Map<String, Object>>> getCalendarCount(
+            @RequestParam Integer year,
+            @RequestParam Integer month) {
+        List<Map<String, Object>> list = articleService.getArticleCountByMonth(year, month);
+        return Result.success(list);
+    }
+
+    /**
+     * 按日期查询文章列表
+     */
+    @GetMapping("/api/calendar/articles")
+    @ResponseBody
+    public Result<List<Article>> getCalendarArticles(
+            @RequestParam String date) {
+        List<Article> list = articleService.getArticlesByDate(date);
+        return Result.success(list);
     }
 }

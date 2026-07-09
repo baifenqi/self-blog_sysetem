@@ -20,9 +20,11 @@
     <select id="selectPage" resultType="Tag">
         SELECT <include refid="Base_Column_List"/>
         FROM blog_tag
-        <if test="name != null and name != ''">
-            WHERE name LIKE CONCAT('%', #{name}, '%')
-        </if>
+        <where>
+            <if test="name != null and name != ''">
+                AND name LIKE CONCAT('%', #{name}, '%')
+            </if>
+        </where>
         ORDER BY create_time DESC
     </select>
 

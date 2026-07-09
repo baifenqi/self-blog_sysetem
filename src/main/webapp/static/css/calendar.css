@@ -1,188 +1,431 @@
+/* ============================================
+   日历头部容器 - 科技感月历风格
+   ============================================ */
 .dashboard-header {
-    display: flex;
-    gap: 15px;
-    margin-bottom: 12px;
-    padding: 8px 18px;
+    display: grid;
+    grid-template-columns: 1fr 260px;
+    gap: 24px;
+    margin-bottom: 20px;
+    padding: 20px 24px;
     background: var(--card);
     border: 1px solid var(--border);
-    border-radius: 12px;
+    border-radius: 20px;
+    backdrop-filter: blur(12px);
+    position: relative;
+    overflow: hidden;
 }
 
+/* 装饰性发光背景 */
+.dashboard-header::before {
+    content: '';
+    position: absolute;
+    top: -50%;
+    left: -20%;
+    width: 400px;
+    height: 400px;
+    background: radial-gradient(circle, rgba(0,217,255,0.08) 0%, transparent 70%);
+    pointer-events: none;
+}
+
+.dashboard-header::after {
+    content: '';
+    position: absolute;
+    bottom: -50%;
+    right: -10%;
+    width: 300px;
+    height: 300px;
+    background: radial-gradient(circle, rgba(255,107,157,0.06) 0%, transparent 70%);
+    pointer-events: none;
+}
+
+/* ============================================
+   左侧月历区域
+   ============================================ */
 .calendar-section {
-    flex: 1;
-    min-width: 0;
+    position: relative;
+    z-index: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    min-height: 0;
 }
 
 .calendar-header {
     display: flex;
     align-items: center;
-    justify-content: center;
-    margin-bottom: 12px;
-}
-
-.calendar-title {
-    font-size: 14px;
-    font-weight: 600;
-    color: var(--text);
-    margin: 0;
-}
-
-.calendar-months {
-    display: flex;
-    gap: 4px;
-    padding-left: 24px;
-    margin-bottom: 4px;
-    overflow-x: auto;
-    scrollbar-width: none;
-    -ms-overflow-style: none;
-}
-
-.calendar-months::-webkit-scrollbar {
-    display: none;
-}
-
-.month-label {
-    font-size: 10px;
-    color: var(--muted);
-    text-align: center;
-    width: 216px;
+    justify-content: space-between;
     flex-shrink: 0;
 }
 
-.contribution-graph {
+.calendar-title {
+    font-size: 16px;
+    font-weight: 700;
+    margin: 0;
+    background: linear-gradient(135deg, var(--primary), var(--secondary));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    letter-spacing: 0.5px;
+}
+
+.calendar-nav {
+    display: flex;
+    gap: 6px;
+}
+
+.calendar-nav-btn {
+    width: 28px;
+    height: 28px;
+    border-radius: 7px;
+    border: 1px solid var(--border);
+    background: rgba(255,255,255,0.03);
+    color: var(--text-secondary);
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s ease;
+    font-size: 13px;
+}
+
+.calendar-nav-btn:hover {
+    background: rgba(0,217,255,0.1);
+    border-color: rgba(0,217,255,0.3);
+    color: var(--primary);
+}
+
+/* 星期标题 */
+.calendar-weekdays {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+    gap: 4px;
+    flex-shrink: 0;
+}
+
+.weekday {
+    text-align: center;
+    font-size: 11px;
+    font-weight: 600;
+    color: var(--muted);
+    padding: 4px 0;
+    letter-spacing: 0.5px;
+}
+
+.weekday.weekend {
+    color: var(--secondary);
+}
+
+/* 日期格子 - flex 1 填充剩余高度 */
+.calendar-days {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+    grid-template-rows: repeat(6, 1fr);
+    gap: 4px;
+    flex: 1;
+    min-height: 0;
+}
+
+.calendar-day {
+    border-radius: 8px;
     display: flex;
     flex-direction: column;
-    gap: 8px;
-    overflow-x: auto;
-    padding-bottom: 8px;
-    scrollbar-width: thin;
-    scrollbar-color: rgba(0,217,255,0.2) rgba(255,255,255,0.02);
-}
-
-.contribution-graph::-webkit-scrollbar {
-    height: 6px;
-}
-
-.contribution-graph::-webkit-scrollbar-track {
-    background: rgba(255,255,255,0.02);
-    border-radius: 3px;
-}
-
-.contribution-graph::-webkit-scrollbar-thumb {
-    background: rgba(0,217,255,0.2);
-    border-radius: 3px;
-}
-
-.graph-row {
-    display: flex;
-    gap: 8px;
-}
-
-.graph-cell {
-    width: 24px;
-    height: 24px;
-    aspect-ratio: 1;
-    border-radius: 6px;
+    align-items: center;
+    justify-content: center;
     cursor: pointer;
-    transition: all 0.15s;
+    transition: all 0.25s ease;
+    position: relative;
+    border: 1px solid transparent;
+    background: rgba(255,255,255,0.02);
+    min-height: 0;
 }
 
-.graph-cell:hover {
-    transform: scale(1.2);
+.calendar-day:hover {
+    background: rgba(0,217,255,0.08);
+    border-color: rgba(0,217,255,0.2);
+    transform: translateY(-1px);
 }
 
-.graph-cell.level-0 {
-    background: rgba(255,255,255,0.08);
+.calendar-day.other-month {
+    opacity: 0.25;
 }
 
-.graph-cell.level-1 {
-    background: rgba(0,217,255,0.25);
+.calendar-day.today {
+    background: linear-gradient(135deg, rgba(0,217,255,0.2), rgba(255,107,157,0.2));
+    border-color: rgba(0,217,255,0.4);
 }
 
-.graph-cell.level-2 {
-    background: rgba(0,217,255,0.45);
+.calendar-day.today .day-number {
+    background: linear-gradient(135deg, var(--primary), var(--secondary));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    font-weight: 700;
 }
 
-.graph-cell.level-3 {
-    background: rgba(0,217,255,0.65);
+.calendar-day.has-articles {
+    background: linear-gradient(135deg, rgba(0,217,255,0.12), rgba(255,107,157,0.08));
+    border-color: rgba(0,217,255,0.2);
 }
 
-.graph-cell.level-4 {
-    background: rgba(0,217,255,0.85);
+.calendar-day.has-articles::after {
+    content: '';
+    position: absolute;
+    bottom: 4px;
+    width: 4px;
+    height: 4px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, var(--primary), var(--secondary));
+    box-shadow: 0 0 4px rgba(0,217,255,0.6);
 }
 
-.graph-cell.today {
-    outline: 1px solid var(--primary);
-    outline-offset: 1px;
+.calendar-day.level-1 {
+    background: linear-gradient(135deg, rgba(0,217,255,0.1), rgba(255,107,157,0.06));
+    border-color: rgba(0,217,255,0.15);
 }
 
+.calendar-day.level-2 {
+    background: linear-gradient(135deg, rgba(0,217,255,0.18), rgba(255,107,157,0.1));
+    border-color: rgba(0,217,255,0.25);
+}
+
+.calendar-day.level-3 {
+    background: linear-gradient(135deg, rgba(0,217,255,0.25), rgba(255,107,157,0.15));
+    border-color: rgba(0,217,255,0.35);
+}
+
+.calendar-day.level-4 {
+    background: linear-gradient(135deg, rgba(0,217,255,0.35), rgba(255,107,157,0.25));
+    border-color: rgba(0,217,255,0.5);
+    box-shadow: 0 0 10px rgba(0,217,255,0.2);
+}
+
+.day-number {
+    font-size: 13px;
+    font-weight: 500;
+    color: var(--text);
+    line-height: 1;
+}
+
+.day-count {
+    font-size: 8px;
+    color: var(--muted);
+    margin-top: 2px;
+    font-weight: 500;
+    line-height: 1;
+}
+
+.calendar-day.level-4 .day-count,
+.calendar-day.level-3 .day-count {
+    color: rgba(255,255,255,0.8);
+}
+
+/* 图例 */
 .calendar-legend {
     display: flex;
     align-items: center;
     justify-content: flex-end;
-    gap: 4px;
-    margin-top: 8px;
+    gap: 8px;
+    flex-shrink: 0;
+}
+
+.legend-item {
+    display: flex;
+    align-items: center;
+    gap: 3px;
 }
 
 .legend-label {
-    font-size: 8px;
+    font-size: 10px;
     color: var(--muted);
 }
 
 .legend-block {
-    width: 9px;
-    height: 9px;
-    border-radius: 2px;
+    width: 11px;
+    height: 11px;
+    border-radius: 3px;
+    border: 1px solid transparent;
 }
 
 .legend-block.level-0 {
-    background: rgba(255,255,255,0.08);
+    background: rgba(255,255,255,0.02);
+    border-color: rgba(255,255,255,0.05);
 }
 
 .legend-block.level-1 {
-    background: rgba(0,217,255,0.25);
+    background: linear-gradient(135deg, rgba(0,217,255,0.1), rgba(255,107,157,0.06));
+    border-color: rgba(0,217,255,0.15);
 }
 
 .legend-block.level-2 {
-    background: rgba(0,217,255,0.45);
+    background: linear-gradient(135deg, rgba(0,217,255,0.18), rgba(255,107,157,0.1));
+    border-color: rgba(0,217,255,0.25);
 }
 
 .legend-block.level-3 {
-    background: rgba(0,217,255,0.65);
+    background: linear-gradient(135deg, rgba(0,217,255,0.25), rgba(255,107,157,0.15));
+    border-color: rgba(0,217,255,0.35);
 }
 
 .legend-block.level-4 {
-    background: rgba(0,217,255,0.85);
+    background: linear-gradient(135deg, rgba(0,217,255,0.35), rgba(255,107,157,0.25));
+    border-color: rgba(0,217,255,0.5);
+    box-shadow: 0 0 6px rgba(0,217,255,0.25);
 }
 
+/* ============================================
+   右侧操作区
+   ============================================ */
+.action-section {
+    position: relative;
+    z-index: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.action-buttons {
+    display: flex;
+    flex-direction: column;
+    gap: 7px;
+}
+
+.btn-primary, .btn-secondary {
+    padding: 10px 16px;
+    border-radius: 10px;
+    border: none;
+    cursor: pointer;
+    font-size: 12px;
+    font-weight: 600;
+    transition: all 0.3s ease;
+    width: 100%;
+    letter-spacing: 0.5px;
+}
+
+.btn-primary {
+    background: linear-gradient(135deg, var(--primary), var(--secondary));
+    color: white;
+    box-shadow: 0 3px 12px rgba(0,217,255,0.25);
+    position: relative;
+    overflow: hidden;
+}
+
+.btn-primary::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
+    transition: left 0.5s ease;
+}
+
+.btn-primary:hover::before {
+    left: 100%;
+}
+
+.btn-primary:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 5px 16px rgba(0,217,255,0.35);
+}
+
+.btn-secondary {
+    background: rgba(255,255,255,0.04);
+    color: var(--text-secondary);
+    border: 1px solid var(--border);
+}
+
+.btn-secondary:hover {
+    background: rgba(0,217,255,0.08);
+    border-color: rgba(0,217,255,0.25);
+    color: var(--text);
+    transform: translateY(-1px);
+}
+
+/* 时钟 */
+.clock-widget {
+    background: linear-gradient(135deg, rgba(0,217,255,0.08), rgba(255,107,157,0.06));
+    border: 1px solid rgba(0,217,255,0.15);
+    border-radius: 12px;
+    padding: 12px;
+    text-align: center;
+    position: relative;
+    overflow: hidden;
+}
+
+.clock-widget::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 60%;
+    height: 1px;
+    background: linear-gradient(90deg, transparent, rgba(0,217,255,0.5), transparent);
+}
+
+.clock-time {
+    font-size: 24px;
+    font-weight: 700;
+    letter-spacing: 1px;
+    background: linear-gradient(135deg, var(--primary), var(--secondary));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    display: block;
+    margin-bottom: 4px;
+    font-variant-numeric: tabular-nums;
+}
+
+.clock-date {
+    font-size: 11px;
+    color: var(--muted);
+    display: block;
+    letter-spacing: 0.5px;
+}
+
+/* 统计卡片 */
 .calendar-stats {
     display: flex;
     flex-direction: column;
     gap: 10px;
-    padding: 14px 16px;
-    background: rgba(255,107,157,0.08);
-    border: 1px solid rgba(255,107,157,0.15);
+    padding: 12px 14px;
+    background: rgba(255,107,157,0.05);
+    border: 1px solid rgba(255,107,157,0.12);
     border-radius: 12px;
-    margin-top: 8px;
+    position: relative;
+    overflow: hidden;
+}
+
+.calendar-stats::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 3px;
+    height: 100%;
+    background: linear-gradient(180deg, var(--secondary), #ff96c0);
 }
 
 .stat-row {
     display: flex;
     justify-content: space-between;
     align-items: center;
+    padding-left: 8px;
 }
 
 .stat-label {
     font-size: 12px;
-    color: rgba(255,255,255,0.8);
+    color: rgba(255,255,255,0.65);
     font-weight: 500;
 }
 
 .stat-value {
-    font-size: 14px;
-    font-weight: 600;
+    font-size: 15px;
+    font-weight: 700;
     color: var(--text);
     white-space: nowrap;
+    font-variant-numeric: tabular-nums;
 }
 
 .stat-value.highlight {
@@ -190,43 +433,185 @@
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
     background-clip: text;
+    font-size: 18px;
 }
 
-.action-section {
+/* ============================================
+   日期文章列表面板
+   ============================================ */
+.date-articles-panel {
+    position: absolute;
+    top: 100%;
+    left: 0;
+    right: 0;
+    margin-top: 10px;
+    background: rgba(15, 15, 25, 0.85);
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
+    border: 1px solid rgba(0, 217, 255, 0.2);
+    border-radius: 14px;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4),
+                0 0 20px rgba(0, 217, 255, 0.1);
+    z-index: 100;
+    overflow: hidden;
+    opacity: 0;
+    transform: translateY(-8px);
+    transition: opacity 0.25s ease, transform 0.25s ease;
+    max-height: 320px;
     display: flex;
     flex-direction: column;
-    gap: 10px;
-    width: 150px;
 }
 
-.btn-primary, .btn-secondary {
-    padding: 8px 12px;
-    border-radius: 6px;
-    border: none;
-    cursor: pointer;
-    font-size: 11px;
-    font-weight: 500;
-    transition: all 0.2s;
+.date-articles-panel.visible {
+    opacity: 1;
+    transform: translateY(0);
 }
 
-.btn-primary {
+.date-articles-panel::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 1px;
+    background: linear-gradient(90deg, transparent, rgba(0, 217, 255, 0.5), rgba(255, 107, 157, 0.5), transparent);
+    pointer-events: none;
+}
+
+.date-articles-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 12px 16px;
+    background: linear-gradient(135deg, rgba(0, 217, 255, 0.08), rgba(255, 107, 157, 0.06));
+    border-bottom: 1px solid rgba(0, 217, 255, 0.12);
+    flex-shrink: 0;
+}
+
+.date-articles-title {
+    font-size: 13px;
+    font-weight: 600;
     background: linear-gradient(135deg, var(--primary), var(--secondary));
-    color: white;
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    letter-spacing: 0.3px;
 }
 
-.btn-primary:hover {
-    transform: translateY(-1px);
-    box-shadow: 0 3px 10px rgba(0,217,255,0.3);
-}
-
-.btn-secondary {
-    background: rgba(255,255,255,0.05);
+.date-articles-close {
+    width: 22px;
+    height: 22px;
+    border-radius: 6px;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    background: rgba(255, 255, 255, 0.03);
     color: var(--muted);
-    border: 1px solid var(--border);
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 16px;
+    line-height: 1;
+    transition: all 0.2s ease;
+    padding: 0;
 }
 
-.btn-secondary:hover {
-    background: rgba(0,217,255,0.1);
-    border-color: rgba(0,217,255,0.2);
+.date-articles-close:hover {
+    background: rgba(255, 107, 157, 0.15);
+    border-color: rgba(255, 107, 157, 0.3);
+    color: var(--secondary);
+    transform: rotate(90deg);
+}
+
+.date-articles-list {
+    flex: 1;
+    overflow-y: auto;
+    padding: 8px;
+}
+
+.date-articles-list::-webkit-scrollbar {
+    width: 4px;
+}
+
+.date-articles-list::-webkit-scrollbar-track {
+    background: transparent;
+}
+
+.date-articles-list::-webkit-scrollbar-thumb {
+    background: linear-gradient(180deg, var(--primary), var(--secondary));
+    border-radius: 2px;
+}
+
+.date-article-item {
+    padding: 10px 12px;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    margin-bottom: 4px;
+    border: 1px solid transparent;
+    background: rgba(255, 255, 255, 0.01);
+}
+
+.date-article-item:last-child {
+    margin-bottom: 0;
+}
+
+.date-article-item:hover {
+    background: linear-gradient(135deg, rgba(0, 217, 255, 0.08), rgba(255, 107, 157, 0.05));
+    border-color: rgba(0, 217, 255, 0.2);
+    transform: translateX(2px);
+}
+
+.date-article-title {
+    font-size: 13px;
+    font-weight: 500;
     color: var(--text);
+    margin-bottom: 4px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    line-height: 1.4;
+}
+
+.date-article-item:hover .date-article-title {
+    background: linear-gradient(135deg, var(--primary), var(--secondary));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+}
+
+.date-article-meta {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-size: 11px;
+    color: var(--muted);
+}
+
+.date-article-category {
+    padding: 1px 6px;
+    border-radius: 4px;
+    background: rgba(0, 217, 255, 0.1);
+    border: 1px solid rgba(0, 217, 255, 0.2);
+    color: var(--primary);
+    font-weight: 500;
+}
+
+.date-article-time {
+    font-variant-numeric: tabular-nums;
+    opacity: 0.8;
+}
+
+.date-articles-empty {
+    padding: 30px 20px;
+    text-align: center;
+    color: var(--muted);
+    font-size: 13px;
+}
+
+.date-articles-empty::before {
+    content: '📭';
+    display: block;
+    font-size: 28px;
+    margin-bottom: 8px;
+    opacity: 0.6;
 }

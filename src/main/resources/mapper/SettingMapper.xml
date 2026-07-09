@@ -13,6 +13,11 @@
         WHERE setting_key = #{settingKey}
     </select>
 
+    <insert id="insert" parameterType="Setting" useGeneratedKeys="true" keyProperty="id">
+        INSERT INTO sys_setting (setting_key, setting_value, description)
+        VALUES (#{settingKey}, #{settingValue}, #{description})
+    </insert>
+
     <insert id="upsert" parameterType="Setting">
         INSERT INTO sys_setting (setting_key, setting_value, description)
         VALUES (#{settingKey}, #{settingValue}, #{description})

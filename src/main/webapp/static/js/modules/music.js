@@ -83,10 +83,54 @@ var MusicModule = {
 
     loadMusicList: function() {
         var items = document.querySelectorAll('.music-popup .music-item');
+        var self = this;
         if (items.length === 0) {
+            fetch(contextPath + '/api/music')
+                .then(function(res) { return res.json(); })
+                .then(function(data) {
+                    if (data.code === 200 && data.data) {
+                        var musicListEl = document.querySelector('.music-popup .music-list');
+                        data.data.forEach(function(m, index) {
+                            self.musicList.push({
+                                url: contextPath + m.url,
+                                title: m.title,
+                                cover: m.cover,
+                                artist: m.artist || ''
+                            });
+                            // 动态创建音乐列表项
+                            if (musicListEl) {
+                                var item = document.createElement('div');
+                                item.className = 'music-item' + (index === 0 ? ' active' : '');
+                                item.dataset.index = index;
+                                item.dataset.url = contextPath + m.url;
+                                item.dataset.title = m.title;
+                                item.dataset.cover = m.cover;
+                                item.innerHTML = '<div class="music-item-title">' + m.title + '</div>' +
+                                    (m.artist ? '<div class="music-item-artist">' + m.artist + '</div>' : '');
+                                item.addEventListener('click', function(e) {
+                                    e.stopPropagation();
+                                    self.selectMusic(parseInt(item.dataset.index));
+                                });
+                                musicListEl.appendChild(item);
+                            }
+                        });
+                        // 初始化第一首音乐信息
+                        if (self.musicList.length > 0 && !self.audio.src) {
+                            var first = self.musicList[0];
+                            var musicTitle = document.getElementById('musicTitle');
+                            var musicCover = document.getElementById('musicCover');
+                            if (musicTitle) musicTitle.textContent = first.title;
+                            if (first.cover && musicCover) {
+                                musicCover.style.backgroundImage = 'url(' + first.cover + ')';
+                                musicCover.style.backgroundSize = 'cover';
+                                musicCover.style.backgroundPosition = 'center';
+                            }
+                        }
+                    }
+                })
+                .catch(function(err) { console.error('加载音乐列表失败:', err); });
             return;
         }
-        var self = this;
         items.forEach(function(item, index) {
             self.musicList.push({
                 url: item.dataset.url,
@@ -101,15 +145,24 @@ var MusicModule = {
     bindEvents: function() {
         var playBtn = document.getElementById('playBtn');
         var musicCover = document.getElementById('musicCover');
+        var musicPlayer = document.querySelector('.music-player');
         var self = this;
 
-        if (playBtn && musicCover) {
+        if (playBtn) {
             playBtn.addEventListener('click', function(e) {
                 e.stopPropagation();
                 self.togglePlay();
             });
         }
 
+        if (musicCover) {
+            musicCover.addEventListener('click', function(e) {
+                e.stopPropagation();
+                self.togglePlay();
+            });
+        }
+
+        // 绑定已有的音乐列表项
         document.querySelectorAll('.music-popup .music-item').forEach(function(item) {
             item.addEventListener('click', function(e) {
                 e.stopPropagation();

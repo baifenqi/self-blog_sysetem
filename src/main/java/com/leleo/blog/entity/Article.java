@@ -70,6 +70,11 @@ public class Article extends BaseEntity {
     private Integer isDeleted;
 
     /**
+     * 状态：0-草稿，1-已发布
+     */
+    private Integer status;
+
+    /**
      * 分类名称（关联查询）
      */
     private String categoryName;
@@ -83,6 +88,11 @@ public class Article extends BaseEntity {
      * 文章标签列表（关联查询）
      */
     private List<Tag> tags;
+
+    /**
+     * 标签ID数组（前端提交）
+     */
+    private Long[] tagIds;
 
     // Getters and Setters
     public String getTitle() {
@@ -181,6 +191,14 @@ public class Article extends BaseEntity {
         this.isDeleted = isDeleted;
     }
 
+    public Integer getStatus() {
+        return status;
+    }
+
+    public void setStatus(Integer status) {
+        this.status = status;
+    }
+
     public String getCategoryName() {
         return categoryName;
     }
@@ -203,5 +221,13 @@ public class Article extends BaseEntity {
 
     public void setTags(List<Tag> tags) {
         this.tags = tags;
+    }
+
+    public Long[] getTagIds() {
+        return tagIds;
+    }
+
+    public void setTagIds(Long[] tagIds) {
+        this.tagIds = tagIds;
     }
 }

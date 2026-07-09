@@ -17,15 +17,17 @@
             window.NavigationModule
         ];
 
-        var allLoaded = modules.every(function(m) {
-            return typeof m !== 'undefined' && m !== null;
+        modules.forEach(function(m) {
+            if (m && typeof m.init === 'function') {
+                try {
+                    m.init();
+                } catch (e) {
+                    console.error('Module init failed:', e);
+                }
+            }
         });
 
-        if (allLoaded) {
-            console.log('All modules loaded successfully');
-        } else {
-            console.warn('Some modules failed to load');
-        }
+        console.log('All modules initialized');
     }
 
     if (document.readyState === 'loading') {

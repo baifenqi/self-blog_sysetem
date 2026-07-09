@@ -116,13 +116,14 @@
             <button type="submit" class="btn-register">注 册</button>
         </form>
         <div class="login-link">
-            已有账号？ <a href="/login">立即登录</a>
+            已有账号？ <a href="${pageContext.request.contextPath}/login">立即登录</a>
         </div>
         <div class="error-msg" id="errorMsg"></div>
         <div class="success-msg" id="successMsg"></div>
     </div>
 
     <script>
+        var contextPath = '${pageContext.request.contextPath}';
         document.getElementById('registerForm').addEventListener('submit', function(e) {
             e.preventDefault();
             var formData = new FormData(this);
@@ -132,7 +133,7 @@
                 return;
             }
             
-            fetch('/register', {
+            fetch(contextPath + '/register', {
                 method: 'POST',
                 body: formData
             })
@@ -142,7 +143,7 @@
                     document.getElementById('successMsg').textContent = '注册成功！正在跳转...';
                     document.getElementById('errorMsg').textContent = '';
                     setTimeout(function() {
-                        window.location.href = '/login';
+                        window.location.href = contextPath + '/login';
                     }, 1500);
                 } else {
                     document.getElementById('errorMsg').textContent = data.message;
